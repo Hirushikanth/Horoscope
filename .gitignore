@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+env/
+build/
+dist/
+*.egg-info/
+
+# Ephemeris & Data
+backend/data/de440.bsp
+backend/data/*.bsp
+backend/data/*.tpc
+backend/data/*.tf
+backend/data/*.jpl
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
