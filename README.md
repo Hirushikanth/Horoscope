@@ -67,7 +67,7 @@ backend/
 4. **Run the API server**:
    ```bash
    cd backend
-   uvicorn main:app --reload
+   python3 -m uvicorn main:app --host 127.0.0.1 --port 8000
    ```
 
 The API will be available at `http://127.0.0.1:8000`. You can view the interactive documentation at `http://127.0.0.1:8000/docs`.
@@ -94,7 +94,3 @@ Run the test suite using `pytest`:
 ```bash
 pytest backend/tests
 ```
-
-## 📜 License
-
-This project is licensed under the MIT License.

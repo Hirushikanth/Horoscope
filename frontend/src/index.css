@@ -1,0 +1,34 @@
+@import "tailwindcss";
+@import "./styles/glass.css";
+
+/* Tailwind v4 Theme Configuration */
+@theme {
+  --color-space-900: #050505;
+  --color-space-800: #0B0D17;
+  --color-gold-primary: #D4A84B;
+  --color-gold-glow: #C89B3C;
+  --color-gold-light: #F5DCA8;
+
+  --font-cinematic: "Playfair Display", serif;
+  --font-sans: "Inter", sans-serif;
+}
+
+@keyframes shine {
+  100% { transform: translateX(100%); }
+}
+
+/* Global resets for the immersive feel */
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--color-space-900);
+  color: #F8F9FA;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Subtle gold selection highlight */
+::selection {
+  background: rgba(212, 168, 75, 0.3);
+  color: #FFF;
+}
