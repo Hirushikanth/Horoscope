@@ -1,7 +1,7 @@
 """
 api.py — REST API Endpoints for Jyotisha
 ==========================================
-7 POST endpoints serving complete Vedic astrology data.
+8 POST endpoints serving complete Vedic astrology data.
 """
 
 from fastapi import APIRouter, HTTPException
@@ -19,6 +19,7 @@ from vedic import (
     get_vimshottari_dasha, get_panchang, get_divisional_charts,
     detect_yogas, get_planetary_dignity,
 )
+from matching import compute_kundali_matching
 from stars import get_star_positions
 
 router = APIRouter()
@@ -249,5 +250,64 @@ async def compute_bhavas(data: BirthData):
         ayanamsa = np.float64(positions['_meta']['ayanamsa'])
         asc_sid = get_sidereal_ascendant(t, data.latitude, data.longitude, ayanamsa)
         return sanitize_numpy(get_bhava(positions, float(asc_sid)))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ═══════════════════════════════════════════════════════════════════════════ #
+# 8. KUNDALI MATCHING — Ashta Koota Milan
+# ═══════════════════════════════════════════════════════════════════════════ #
+
+class MatchingData(BaseModel):
+    """Input model for Kundali Matching — accepts birth data for two individuals."""
+    bride: BirthData = Field(..., description="Bride's birth data")
+    groom: BirthData = Field(..., description="Groom's birth data")
+
+
+def _compute_person(data: BirthData) -> tuple[dict, float]:
+    """
+    Compute planetary positions and sidereal ascendant for one person.
+    Returns (planets dict, sidereal ascendant longitude).
+    """
+    ts, eph = load_ephemeris()
+    t = datetime_to_skyfield_time(data.date, data.time, data.timezone)
+    positions = get_planetary_positions(
+        data.date, data.time, data.latitude, data.longitude, data.timezone
+    )
+    ayanamsa = np.float64(positions['_meta']['ayanamsa'])
+    asc_sid = get_sidereal_ascendant(t, data.latitude, data.longitude, ayanamsa)
+    return positions, float(asc_sid)
+
+
+@router.post("/matching")
+async def compute_matching(data: MatchingData):
+    """
+    Kundali Matching: Ashta Koota Milan (36-point system).
+
+    Compares the birth charts of bride and groom across 8 compatibility
+    factors (Varna, Vashya, Tara, Yoni, Graha Maitri, Gana, Bhakoot, Nadi)
+    plus Manglik Dosha and Vedha checks.
+    """
+    try:
+        # Compute chart data for both individuals
+        bride_planets, bride_asc = _compute_person(data.bride)
+        groom_planets, groom_asc = _compute_person(data.groom)
+
+        # Extract Moon sidereal longitudes
+        bride_moon_lon = bride_planets['Moon']['sidereal_longitude']
+        groom_moon_lon = groom_planets['Moon']['sidereal_longitude']
+
+        # Compute Kundali Matching
+        result = compute_kundali_matching(
+            bride_moon_lon=bride_moon_lon,
+            groom_moon_lon=groom_moon_lon,
+            bride_planets=bride_planets,
+            groom_planets=groom_planets,
+            bride_asc_sid=bride_asc,
+            groom_asc_sid=groom_asc,
+        )
+
+        return sanitize_numpy(result)
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
