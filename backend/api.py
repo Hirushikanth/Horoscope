@@ -262,6 +262,10 @@ class MatchingData(BaseModel):
     """Input model for Kundali Matching — accepts birth data for two individuals."""
     bride: BirthData = Field(..., description="Bride's birth data")
     groom: BirthData = Field(..., description="Groom's birth data")
+    system: str = Field(
+        default="both",
+        description="Matching system to use: 'north_indian', 'south_indian', or 'both'."
+    )
 
 
 def _compute_person(data: BirthData) -> tuple[dict, float]:
@@ -282,11 +286,10 @@ def _compute_person(data: BirthData) -> tuple[dict, float]:
 @router.post("/matching")
 async def compute_matching(data: MatchingData):
     """
-    Kundali Matching: Ashta Koota Milan (36-point system).
-
-    Compares the birth charts of bride and groom across 8 compatibility
-    factors (Varna, Vashya, Tara, Yoni, Graha Maitri, Gana, Bhakoot, Nadi)
-    plus Manglik Dosha and Vedha checks.
+    Kundali Matching: Ashta Koota Milan & Dashakoota Poruthams.
+    
+    Compares the birth charts of bride and groom across compatibility
+    factors depending on the selected system ('north_indian', 'south_indian', 'both').
     """
     try:
         # Compute chart data for both individuals
@@ -307,6 +310,7 @@ async def compute_matching(data: MatchingData):
             groom_asc_sid=groom_asc,
             bride_birth_date=data.bride.date,
             groom_birth_date=data.groom.date,
+            system=data.system
         )
 
         return sanitize_numpy(result)

@@ -1559,6 +1559,7 @@ def compute_kundali_matching(
     groom_asc_sid: float,
     bride_birth_date: str = None,
     groom_birth_date: str = None,
+    system: str = "both",
 ) -> dict:
     """
     Compute complete Kundali Matching: Ashta Koota Milan (36 points)
@@ -1727,6 +1728,54 @@ def compute_kundali_matching(
             f"Warnings: {'; '.join(warnings)}"
         )
 
+    # ── Filter Result Based on Requested System ──
+    if system == "north_indian":
+        return {
+            "bride": {"nakshatra": bride_nak, "rashi": bride_rashi, "moon_longitude": float(bride_moon_lon)},
+            "groom": {"nakshatra": groom_nak, "rashi": groom_rashi, "moon_longitude": float(groom_moon_lon)},
+            "kootas": {
+                "varna": varna, "vashya": vashya, "tara": tara, "yoni": yoni,
+                "graha_maitri": graha_maitri, "gana": gana, "bhakoot": bhakoot, "nadi": nadi,
+            },
+            "total_points": total_points,
+            "max_points": max_points,
+            "compatibility_level": level,
+            "compatibility_description": level_desc,
+            "vedha": vedha,
+            "manglik_dosha": {"bride": bride_manglik, "groom": groom_manglik, "both_manglik_cancellation": both_manglik},
+            "navamsa_compatibility": navamsa_compat,
+            "lagna_analysis": lagna_compat,
+            **({"dasha_compatibility": dasha_compat} if dasha_compat else {}),
+            "warnings": warnings,
+            "conclusion": conclusion,
+        }
+    
+    elif system == "south_indian":
+        # Overwrite warnings to just the South Indian scope?
+        si_warnings = []
+        if south_indian.get("rajju_dosha"):
+            si_warnings.append("Severe Rajju Dosha present — highly inauspicious for marital longevity.")
+        if vedha.get("has_vedha"):
+            si_warnings.append("Vedha Dosha is present — Nakshatras are mutually afflicting.")
+        
+        si_conclusion = south_indian["assessment"]
+        if si_warnings:
+            si_conclusion += f" Warnings: {'; '.join(si_warnings)}"
+            
+        return {
+            "bride": {"nakshatra": bride_nak, "rashi": bride_rashi, "moon_longitude": float(bride_moon_lon)},
+            "groom": {"nakshatra": groom_nak, "rashi": groom_rashi, "moon_longitude": float(groom_moon_lon)},
+            "south_indian_poruthams": south_indian,
+            "vedha": vedha,  # Kept as it is an integral overlapping dosha
+            "manglik_dosha": {"bride": bride_manglik, "groom": groom_manglik, "both_manglik_cancellation": both_manglik},
+            "navamsa_compatibility": navamsa_compat,
+            "lagna_analysis": lagna_compat,
+            **({"dasha_compatibility": dasha_compat} if dasha_compat else {}),
+            "warnings": si_warnings,
+            "conclusion": si_conclusion,
+        }
+
+    # Default "both"
     result = {
         "bride": {
             "nakshatra": bride_nak,

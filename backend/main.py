@@ -10,7 +10,7 @@ from api import router as api_router
 app = FastAPI(
     title="Jyotisha — Precision Vedic Astrology API",
     description="NASA JPL DE440 ephemeris-backed Vedic astrology calculations with IEEE 754 float64 precision.",
-    version="1.5.0",
+    version="1.6.0",
 )
 
 app.add_middleware(
@@ -28,7 +28,7 @@ app.include_router(api_router, prefix="/api")
 async def root():
     return {
         "name": "Jyotisha API",
-        "version": "1.5.0",
+        "version": "1.6.0",
         "precision": "IEEE 754 float64",
         "ephemeris": "NASA JPL DE440",
     }
