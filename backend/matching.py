@@ -25,9 +25,12 @@ References:
 """
 
 import numpy as np
+from datetime import datetime
 from vedic import (
     NAKSHATRAS, RASHIS, get_nakshatra, get_rashi,
-    get_bhava, get_planetary_dignity,
+    get_bhava, get_planetary_dignity, get_navamsa,
+    get_vimshottari_dasha, DASHA_SEQUENCE, DASHA_YEARS,
+    OWN_SIGNS, EXALTATION, DEBILITATION,
 )
 
 
@@ -244,6 +247,19 @@ BHAKOOT_DOSHA_PAIRS: set[tuple[int, int]] = {
 #   Antya (Kapha)  → Nakshatras 3, 6, 9, 12, 15, 18, 21, 24, 27  (i % 3 == 2)
 
 NADI_NAMES: list[str] = ["Aadi (Vata)", "Madhya (Pitta)", "Antya (Kapha)"]
+
+# Nakshatras where same-star marriage is auspicious even with same Nadi.
+# Reference: Muhurta Chintamani by Daivagna Rama
+NADI_EXEMPT_NAKSHATRAS: set[int] = {
+    3,   # Rohini
+    5,   # Ardra
+    7,   # Pushya
+    9,   # Magha
+    15,  # Vishakha
+    21,  # Shravana
+    25,  # Uttara Bhadrapada
+    26,  # Revati
+}
 
 
 # ═══════════════════════════════════════════════════════════════════════════ #
@@ -647,24 +663,32 @@ def calc_gana_koota(bride_nak_idx: int, groom_nak_idx: int) -> dict:
 # KOOTA 7: BHAKOOT — Emotional & Family Harmony (7 points)
 # ═══════════════════════════════════════════════════════════════════════════ #
 
-def calc_bhakoot_koota(bride_rashi_idx: int, groom_rashi_idx: int) -> dict:
+def calc_bhakoot_koota(
+    bride_rashi_idx: int, groom_rashi_idx: int,
+    bride_moon_lon: float = None, groom_moon_lon: float = None,
+) -> dict:
     """
     Bhakoot Koota — emotional and family harmony between Moon signs.
 
     Dosha occurs when the relative Rashi positions form 2/12, 5/9, or 6/8.
-    Dosha is cancelled when Rashi lords are the same or mutual friends.
+
+    Cancellation conditions (BPHS, Muhurta Chintamani, Phaldeepika):
+        1. Rashi lords are the same planet
+        2. Rashi lords are mutual friends
+        3. Navamsa (D9) lords of both Moons are same or mutual friends
 
     Parameters:
         bride_rashi_idx: Bride's Moon Rashi index (0-11)
         groom_rashi_idx: Groom's Moon Rashi index (0-11)
+        bride_moon_lon:  Optional — Bride's Moon sidereal longitude for D9 check
+        groom_moon_lon:  Optional — Groom's Moon sidereal longitude for D9 check
 
     Returns:
         dict with obtained, max, description, dosha_present, dosha_cancelled
 
     References:
-        Muhurta Chintamani, Phaldeepika Ch. 7
+        Muhurta Chintamani, Phaldeepika Ch. 7, BPHS
     """
-    # Relative positions (1-12)
     bride_to_groom: int = (groom_rashi_idx - bride_rashi_idx) % 12 + 1
     groom_to_bride: int = (bride_rashi_idx - groom_rashi_idx) % 12 + 1
 
@@ -672,18 +696,52 @@ def calc_bhakoot_koota(bride_rashi_idx: int, groom_rashi_idx: int) -> dict:
     has_dosha: bool = pair in BHAKOOT_DOSHA_PAIRS
 
     dosha_cancelled: bool = False
+    cancellation_reasons: list[str] = []
+
     if has_dosha:
-        # Check cancellation: same lord or mutual friendship
         bride_lord: str = _get_rashi_lord(bride_rashi_idx)
         groom_lord: str = _get_rashi_lord(groom_rashi_idx)
 
+        # Cancellation 1: Same Rashi lord
         if bride_lord == groom_lord:
             dosha_cancelled = True
+            cancellation_reasons.append(
+                f"Same Rashi lord ({bride_lord}) — Bhakoot Dosha cancelled."
+            )
         else:
+            # Cancellation 2: Mutual friendship of Rashi lords
             f_bg: int = _get_graha_friendship(bride_lord, groom_lord)
             f_gb: int = _get_graha_friendship(groom_lord, bride_lord)
             if f_bg >= 1 and f_gb >= 1:
                 dosha_cancelled = True
+                cancellation_reasons.append(
+                    f"Rashi lords ({bride_lord} and {groom_lord}) are mutual friends "
+                    f"— Bhakoot Dosha cancelled."
+                )
+
+        # Cancellation 3: Navamsa lord friendship (when Rashi lords don't cancel)
+        if not dosha_cancelled and bride_moon_lon is not None and groom_moon_lon is not None:
+            bride_d9 = get_navamsa(bride_moon_lon)
+            groom_d9 = get_navamsa(groom_moon_lon)
+            bride_d9_lord = bride_d9.get("lord", "")
+            groom_d9_lord = groom_d9.get("lord", "")
+
+            if bride_d9_lord and groom_d9_lord:
+                if bride_d9_lord == groom_d9_lord:
+                    dosha_cancelled = True
+                    cancellation_reasons.append(
+                        f"Same Navamsa lord ({bride_d9_lord}) — Bhakoot Dosha "
+                        f"cancelled via D9 chart."
+                    )
+                else:
+                    f_d9_bg = _get_graha_friendship(bride_d9_lord, groom_d9_lord)
+                    f_d9_gb = _get_graha_friendship(groom_d9_lord, bride_d9_lord)
+                    if f_d9_bg >= 1 and f_d9_gb >= 1:
+                        dosha_cancelled = True
+                        cancellation_reasons.append(
+                            f"Navamsa lords ({bride_d9_lord} and {groom_d9_lord}) "
+                            f"are mutual friends — Bhakoot Dosha cancelled via D9."
+                        )
 
     if not has_dosha:
         obtained = np.float64(7.0)
@@ -692,8 +750,8 @@ def calc_bhakoot_koota(bride_rashi_idx: int, groom_rashi_idx: int) -> dict:
     elif dosha_cancelled:
         obtained = np.float64(7.0)
         dosha_type = f"{bride_to_groom}/{groom_to_bride} (Cancelled)"
-        desc = (f"Bhakoot Dosha ({bride_to_groom}/{groom_to_bride}) present but cancelled — "
-                f"Rashi lords are same or mutual friends.")
+        desc = (f"Bhakoot Dosha ({bride_to_groom}/{groom_to_bride}) present but cancelled. "
+                + " ".join(cancellation_reasons))
     else:
         obtained = np.float64(0.0)
         dosha_type = f"{bride_to_groom}/{groom_to_bride}"
@@ -706,6 +764,7 @@ def calc_bhakoot_koota(bride_rashi_idx: int, groom_rashi_idx: int) -> dict:
         "dosha_present": has_dosha,
         "dosha_cancelled": dosha_cancelled,
         "dosha_type": dosha_type,
+        "cancellation_reasons": cancellation_reasons,
         "description": desc,
     }
 
@@ -716,28 +775,35 @@ def calc_bhakoot_koota(bride_rashi_idx: int, groom_rashi_idx: int) -> dict:
 
 def calc_nadi_koota(
     bride_nak_idx: int, groom_nak_idx: int,
-    bride_rashi_idx: int, groom_rashi_idx: int
+    bride_rashi_idx: int, groom_rashi_idx: int,
+    bride_pada: int = None, groom_pada: int = None,
 ) -> dict:
     """
     Nadi Koota — genetic and health compatibility.
 
     Same Nadi → Nadi Dosha (0 points). Different Nadi → 8 points.
 
-    Cancellation conditions:
+    Cancellation conditions (BPHS, Muhurta Chintamani):
         1. Same Nakshatra but different Rashi → dosha cancelled.
         2. Same Rashi but different Nakshatra → dosha cancelled.
+        3. Same Nakshatra, same Rashi, different Pada → dosha cancelled.
+        4. Both in auspicious Nakshatra exemption list → dosha cancelled.
+        5. Moon sign lords are the same planet → dosha cancelled.
 
     Parameters:
         bride_nak_idx:   Bride's Nakshatra index (0-26)
         groom_nak_idx:   Groom's Nakshatra index (0-26)
         bride_rashi_idx: Bride's Moon Rashi index (0-11)
         groom_rashi_idx: Groom's Moon Rashi index (0-11)
+        bride_pada:      Optional — Bride's Nakshatra Pada (1-4)
+        groom_pada:      Optional — Groom's Nakshatra Pada (1-4)
 
     Returns:
         dict with obtained, max, bride_nadi, groom_nadi, description
 
     References:
         Brihat Parashara Hora Shastra, Ch. 79-80
+        Muhurta Chintamani by Daivagna Rama
     """
     bride_nadi: int = _get_nadi(bride_nak_idx)
     groom_nadi: int = _get_nadi(groom_nak_idx)
@@ -746,26 +812,63 @@ def calc_nadi_koota(
 
     same_nadi: bool = (bride_nadi == groom_nadi)
     dosha_cancelled: bool = False
+    cancellation_reasons: list[str] = []
 
     if same_nadi:
-        # Check cancellation conditions
         same_nakshatra: bool = (bride_nak_idx == groom_nak_idx)
         same_rashi: bool = (bride_rashi_idx == groom_rashi_idx)
-        different_rashi: bool = not same_rashi
-        different_nakshatra: bool = not same_nakshatra
 
-        if same_nakshatra and different_rashi:
+        # Rule 1: Same Nakshatra, different Rashi
+        if same_nakshatra and not same_rashi:
             dosha_cancelled = True
-        elif same_rashi and different_nakshatra:
+            cancellation_reasons.append(
+                "Same Nakshatra but different Rashi — Nadi Dosha cancelled."
+            )
+
+        # Rule 2: Same Rashi, different Nakshatra
+        if not dosha_cancelled and same_rashi and not same_nakshatra:
             dosha_cancelled = True
+            cancellation_reasons.append(
+                "Same Rashi but different Nakshatra — Nadi Dosha cancelled."
+            )
+
+        # Rule 3: Same Nakshatra + same Rashi + different Pada
+        if not dosha_cancelled and same_nakshatra and same_rashi:
+            if bride_pada is not None and groom_pada is not None:
+                if bride_pada != groom_pada:
+                    dosha_cancelled = True
+                    cancellation_reasons.append(
+                        f"Same Nakshatra and Rashi but different Pada "
+                        f"({bride_pada} vs {groom_pada}) — Nadi Dosha cancelled."
+                    )
+
+        # Rule 4: Auspicious Nakshatra exemption
+        if not dosha_cancelled and same_nakshatra:
+            if bride_nak_idx in NADI_EXEMPT_NAKSHATRAS:
+                dosha_cancelled = True
+                nak_name = NAKSHATRAS[bride_nak_idx]["name"]
+                cancellation_reasons.append(
+                    f"{nak_name} is an auspicious Nakshatra for same-star "
+                    f"marriage — Nadi Dosha cancelled."
+                )
+
+        # Rule 5: Moon sign lords are the same planet
+        if not dosha_cancelled:
+            bride_lord = _get_rashi_lord(bride_rashi_idx)
+            groom_lord = _get_rashi_lord(groom_rashi_idx)
+            if bride_lord == groom_lord:
+                dosha_cancelled = True
+                cancellation_reasons.append(
+                    f"Same Moon sign lord ({bride_lord}) — Nadi Dosha cancelled."
+                )
 
     if not same_nadi:
         obtained = np.float64(8.0)
         desc = f"Different Nadis ({bride_nadi_name} and {groom_nadi_name}) — excellent health compatibility."
     elif dosha_cancelled:
         obtained = np.float64(8.0)
-        desc = (f"Same Nadi ({bride_nadi_name}) but Nadi Dosha is cancelled — "
-                f"acceptable health compatibility.")
+        desc = (f"Same Nadi ({bride_nadi_name}) but Nadi Dosha is cancelled. "
+                + " ".join(cancellation_reasons))
     else:
         obtained = np.float64(0.0)
         desc = f"Same Nadi ({bride_nadi_name}) — Nadi Dosha present. Potential health/progeny concerns."
@@ -777,6 +880,7 @@ def calc_nadi_koota(
         "groom_nadi": groom_nadi_name,
         "dosha_present": same_nadi,
         "dosha_cancelled": dosha_cancelled,
+        "cancellation_reasons": cancellation_reasons,
         "description": desc,
     }
 
@@ -832,27 +936,44 @@ def check_manglik_dosha(
     ascendant_sidereal: float
 ) -> dict:
     """
-    Check if the native has Manglik (Kuja) Dosha.
+    Check if the native has Manglik (Kuja) Dosha with full classical cancellation rules.
 
     Manglik Dosha occurs when Mars is placed in houses 1, 2, 4, 7, 8, or 12
     from the Ascendant (Lagna).
 
-    Cancellation conditions:
-        1. Mars in its own sign (Aries or Scorpio)
-        2. Mars is exalted (in Capricorn)
-        3. Mars is debilitated (in Cancer) — some traditions consider this cancellation
-        4. Jupiter or Venus aspects/conjoins Mars
-        5. Both partners are Manglik (checked at the orchestration level)
+    16 Cancellation conditions (BPHS, Phaldeepika, Classical Texts):
+        1.  Mars in own sign (Aries or Scorpio)
+        2.  Mars exalted (Capricorn)
+        3.  Mars debilitated (Cancer) — malefic power reduced
+        4.  Jupiter aspects Mars (5th, 7th, 9th from Jupiter)
+        5.  Jupiter conjoins Mars (same sign)
+        6.  Venus conjoins Mars (same sign)
+        7.  Moon conjoins Mars (same sign)
+        8.  Saturn/Rahu/Ketu conjoins Mars (same sign)
+        9.  Mars in 1st house in: Aries, Leo, Aquarius
+        10. Mars in 2nd house in: Gemini, Virgo
+        11. Mars in 4th house in: Aries, Scorpio
+        12. Mars in 7th house in: Cancer, Capricorn
+        13. Mars in 8th house in: Sagittarius, Pisces
+        14. Mars in 12th house in: Taurus, Libra
+        15. Yogakaraka Mars (Cancer or Leo ascendant)
+        16. Benefic (Jupiter/Venus) in Lagna
+
+    Strength grading:
+        Severe:     Mars in 7th or 8th, zero cancellations
+        Moderate:   Mars in 1st, 4th, or 12th, or 1-2 cancellations
+        Mild:       Mars in 2nd, or 3+ cancellations
+        Negligible: Multiple strong cancellations
 
     Parameters:
         planets: dict of planetary positions (from ephemeris)
         ascendant_sidereal: Sidereal ascendant longitude in degrees
 
     Returns:
-        dict with is_manglik, mars_house, cancellation details
+        dict with is_manglik, mars_house, strength, cancellation details
 
     References:
-        Brihat Parashara Hora Shastra, Phaldeepika
+        Brihat Parashara Hora Shastra, Phaldeepika by Mantreswara
     """
     mars_data = planets.get("Mars")
     if mars_data is None:
@@ -874,42 +995,133 @@ def check_manglik_dosha(
         return {
             "is_manglik": False,
             "mars_house": mars_house,
+            "mars_sign": RASHIS[mars_sign_idx]["name"],
             "description": f"Mars in house {mars_house} — no Manglik Dosha.",
         }
 
-    # Check cancellation conditions
-    cancellations: list[str] = []
-    is_cancelled: bool = False
+    # ── Helper functions ──
+    def _sign_of(planet_name: str) -> int:
+        """Get sign index (0-11) of a planet, or -1 if absent."""
+        p = planets.get(planet_name)
+        if p is None:
+            return -1
+        return int(np.float64(p.get("sidereal_longitude", 0.0)) % np.float64(360.0) / np.float64(30.0))
 
+    def _house_of(planet_name: str) -> int:
+        """Get house (1-12) of a planet from Lagna, or -1 if absent."""
+        s = _sign_of(planet_name)
+        if s < 0:
+            return -1
+        return (s - asc_sign_idx) % 12 + 1
+
+    # ── Collect all applicable cancellations ──
+    cancellations: list[str] = []
     mars_dignity = get_planetary_dignity("Mars", mars_sid)
 
-    # Mars in own sign (Aries=0, Scorpio=7)
+    # Rule 1: Mars in own sign (Aries=0, Scorpio=7)
     if mars_sign_idx in [0, 7]:
-        cancellations.append("Mars in own sign — Manglik Dosha cancelled.")
-        is_cancelled = True
+        cancellations.append(
+            f"Mars in own sign ({RASHIS[mars_sign_idx]['name']}) — Manglik power subdued."
+        )
 
-    # Mars exalted (Capricorn=9)
+    # Rule 2: Mars exalted (Capricorn=9)
     if mars_sign_idx == 9:
-        cancellations.append("Mars is exalted in Capricorn — Manglik Dosha cancelled.")
-        is_cancelled = True
+        cancellations.append("Mars exalted in Capricorn — Manglik Dosha cancelled.")
 
-    # Jupiter or Venus in same house as Mars (conjunction check)
+    # Rule 3: Mars debilitated (Cancer=3)
+    if mars_sign_idx == 3:
+        cancellations.append("Mars debilitated in Cancer — malefic power greatly reduced.")
+
+    # Rule 4: Jupiter aspects Mars (5th, 7th, 9th from Jupiter)
+    jup_sign = _sign_of("Jupiter")
+    if jup_sign >= 0 and jup_sign != mars_sign_idx:
+        aspect_diff = (mars_sign_idx - jup_sign) % 12 + 1
+        if aspect_diff in [5, 7, 9]:
+            cancellations.append(
+                "Jupiter aspects Mars — benefic influence cancels Manglik Dosha."
+            )
+
+    # Rule 5: Jupiter conjoins Mars (same sign)
+    if jup_sign >= 0 and jup_sign == mars_sign_idx:
+        cancellations.append(
+            "Jupiter conjoins Mars in same sign — Manglik Dosha cancelled."
+        )
+
+    # Rule 6: Venus conjoins Mars
+    ven_sign = _sign_of("Venus")
+    if ven_sign >= 0 and ven_sign == mars_sign_idx:
+        cancellations.append(
+            "Venus conjoins Mars — benefic influence mitigates Manglik Dosha."
+        )
+
+    # Rule 7: Moon conjoins Mars
+    moon_sign = _sign_of("Moon")
+    if moon_sign >= 0 and moon_sign == mars_sign_idx:
+        cancellations.append("Moon conjoins Mars — Manglik Dosha cancelled.")
+
+    # Rule 8: Saturn/Rahu/Ketu conjoins Mars
+    for shadow in ["Saturn", "Rahu", "Ketu"]:
+        s_sign = _sign_of(shadow)
+        if s_sign >= 0 and s_sign == mars_sign_idx:
+            cancellations.append(f"{shadow} conjoins Mars — Manglik effect neutralized.")
+
+    # Rules 9–14: Sign-specific house cancellations (BPHS)
+    HOUSE_SIGN_CANCELLATIONS: dict[int, set[int]] = {
+        1:  {0, 4, 10},    # Aries, Leo, Aquarius
+        2:  {2, 5},         # Gemini, Virgo
+        4:  {0, 7},         # Aries, Scorpio
+        7:  {3, 9},         # Cancer, Capricorn
+        8:  {8, 11},        # Sagittarius, Pisces
+        12: {1, 6},         # Taurus, Libra
+    }
+    if mars_house in HOUSE_SIGN_CANCELLATIONS:
+        if mars_sign_idx in HOUSE_SIGN_CANCELLATIONS[mars_house]:
+            cancellations.append(
+                f"Mars in house {mars_house} in {RASHIS[mars_sign_idx]['name']} "
+                f"— sign-specific cancellation applies (BPHS)."
+            )
+
+    # Rule 15: Yogakaraka Mars (Cancer=3 or Leo=4 ascendant)
+    if asc_sign_idx in [3, 4]:
+        cancellations.append(
+            f"Mars is Yogakaraka for {RASHIS[asc_sign_idx]['name']} Lagna "
+            f"— Manglik Dosha does not apply."
+        )
+
+    # Rule 16: Benefic (Jupiter/Venus) in Lagna
     for benefic in ["Jupiter", "Venus"]:
-        if benefic in planets:
-            benefic_sid: float = planets[benefic].get("sidereal_longitude", 0.0)
-            benefic_sign: int = int(np.float64(benefic_sid) % np.float64(360.0) / np.float64(30.0))
-            benefic_house: int = (benefic_sign - asc_sign_idx) % 12 + 1
-            if benefic_house == mars_house:
-                cancellations.append(
-                    f"{benefic} conjoins Mars in house {mars_house} — Manglik Dosha mitigated."
-                )
-                is_cancelled = True
+        b_house = _house_of(benefic)
+        if b_house == 1:
+            cancellations.append(
+                f"{benefic} in Lagna — benefic protection cancels Manglik Dosha."
+            )
+
+    # ── Determine cancellation status and strength ──
+    is_cancelled: bool = len(cancellations) > 0
+    num_c = len(cancellations)
+
+    if not is_cancelled:
+        if mars_house in [7, 8]:
+            strength = "Severe"
+        elif mars_house in [1, 4, 12]:
+            strength = "Moderate"
+        else:
+            strength = "Mild"
+    else:
+        if num_c >= 3:
+            strength = "Negligible"
+        elif num_c == 2:
+            strength = "Mild"
+        else:
+            strength = "Moderate"
 
     if is_cancelled:
-        desc = f"Mars in house {mars_house} — Manglik Dosha present but cancelled. " + \
-               " ".join(cancellations)
+        desc = (f"Mars in house {mars_house} ({RASHIS[mars_sign_idx]['name']}) — "
+                f"Manglik Dosha present but mitigated ({strength}). "
+                + " ".join(cancellations))
     else:
-        desc = (f"Mars in house {mars_house} — Manglik Dosha present. "
+        desc = (f"Mars in house {mars_house} ({RASHIS[mars_sign_idx]['name']}) — "
+                f"Manglik Dosha present ({strength}). "
                 f"May indicate challenges in marital harmony.")
 
     return {
@@ -918,8 +1130,301 @@ def check_manglik_dosha(
         "mars_house": mars_house,
         "mars_sign": RASHIS[mars_sign_idx]["name"],
         "mars_dignity": mars_dignity.get("status", ""),
+        "strength": strength,
         "cancellations": cancellations,
+        "cancellation_count": num_c,
         "description": desc,
+    }
+
+# ═══════════════════════════════════════════════════════════════════════════ #
+# NAVAMSA (D9) MARRIAGE COMPATIBILITY
+# ═══════════════════════════════════════════════════════════════════════════ #
+
+def _check_d9_dignity(planet_name: str, d9_sign_idx_0based: int) -> str:
+    """
+    Check planetary dignity by Navamsa sign index (0-based).
+    Returns: 'Exalted', 'Debilitated', 'Own Sign', or 'Neutral'.
+    """
+    if planet_name in ('Rahu', 'Ketu'):
+        return 'Neutral'
+    sign_1based = d9_sign_idx_0based + 1
+    if planet_name in EXALTATION:
+        if sign_1based == EXALTATION[planet_name][0]:
+            return 'Exalted'
+    if planet_name in DEBILITATION:
+        if sign_1based == DEBILITATION[planet_name][0]:
+            return 'Debilitated'
+    if planet_name in OWN_SIGNS:
+        if sign_1based in OWN_SIGNS[planet_name]:
+            return 'Own Sign'
+    return 'Neutral'
+
+
+def _analyze_navamsa_compatibility(
+    bride_planets: dict, groom_planets: dict,
+    bride_asc_sid: float, groom_asc_sid: float,
+) -> dict:
+    """
+    Analyze marriage compatibility using Navamsa (D9) divisional chart.
+
+    The D9 chart reveals the soul's truth about marriage — spouse nature,
+    marital quality, and relationship endurance.
+
+    Analysis:
+        1. D9 Lagna and 7th house lord for both
+        2. Venus placement in D9 (karaka of romance)
+        3. Jupiter placement in D9 (karaka of husband/dharma)
+        4. Vargottama planets (same sign in D1 and D9)
+        5. D9 7th lord cross-chart compatibility
+
+    References:
+        Brihat Parashara Hora Shastra Ch. 6-7, Jataka Parijata
+    """
+    def _analyze_person(planets: dict, asc_sid: float) -> dict:
+        d9_asc = get_navamsa(asc_sid)
+        d9_asc_idx = d9_asc["index"] - 1
+        d9_7th_idx = (d9_asc_idx + 6) % 12
+        d9_7th_lord = RASHIS[d9_7th_idx]["lord"]
+
+        analysis = {
+            "d9_lagna": d9_asc["name"],
+            "d9_7th_house": RASHIS[d9_7th_idx]["name"],
+            "d9_7th_lord": d9_7th_lord,
+            "vargottama_planets": [],
+            "venus_d9": None,
+            "jupiter_d9": None,
+        }
+
+        for pname in ["Venus", "Jupiter", "Moon", "Mars", "Sun", "Mercury", "Saturn"]:
+            pdata = planets.get(pname)
+            if pdata is None:
+                continue
+            sid_lon = pdata.get("sidereal_longitude", 0.0)
+            d1_sign_idx = int(np.float64(sid_lon) % np.float64(360.0) / np.float64(30.0))
+            d9_info = get_navamsa(sid_lon)
+            d9_sign_idx = d9_info["index"] - 1
+
+            if d1_sign_idx == d9_sign_idx:
+                analysis["vargottama_planets"].append(pname)
+
+            if pname == "Venus":
+                analysis["venus_d9"] = {
+                    "sign": d9_info["name"],
+                    "dignity": _check_d9_dignity("Venus", d9_sign_idx),
+                }
+            if pname == "Jupiter":
+                analysis["jupiter_d9"] = {
+                    "sign": d9_info["name"],
+                    "dignity": _check_d9_dignity("Jupiter", d9_sign_idx),
+                }
+
+        return analysis
+
+    bride_d9 = _analyze_person(bride_planets, bride_asc_sid)
+    groom_d9 = _analyze_person(groom_planets, groom_asc_sid)
+
+    # ── Cross-chart compatibility ──
+    factors: list[str] = []
+    pos = 0
+    neg = 0
+
+    # 1. D9 7th lord compatibility
+    b7l = bride_d9["d9_7th_lord"]
+    g7l = groom_d9["d9_7th_lord"]
+    if b7l == g7l:
+        factors.append(f"Both have same D9 7th lord ({b7l}) — strong marital bond.")
+        pos += 2
+    else:
+        f1 = _get_graha_friendship(b7l, g7l)
+        f2 = _get_graha_friendship(g7l, b7l)
+        if f1 >= 1 and f2 >= 1:
+            factors.append(f"D9 7th lords ({b7l} and {g7l}) are mutual friends — harmonious.")
+            pos += 1
+        elif f1 <= -1 or f2 <= -1:
+            factors.append(f"D9 7th lords ({b7l} and {g7l}) have enmity — may face friction.")
+            neg += 1
+
+    # 2. Vargottama count
+    bv = len(bride_d9.get("vargottama_planets", []))
+    gv = len(groom_d9.get("vargottama_planets", []))
+    if bv + gv >= 3:
+        factors.append(f"Multiple Vargottama planets ({bv} bride, {gv} groom) — strong support.")
+        pos += 1
+
+    # 3. Venus dignity in D9
+    for d9, label in [(bride_d9, "Bride"), (groom_d9, "Groom")]:
+        v = d9.get("venus_d9")
+        if v:
+            if v["dignity"] in ["Exalted", "Own Sign"]:
+                factors.append(f"{label}'s Venus strong in D9 ({v['sign']}) — enriches married life.")
+                pos += 1
+            elif v["dignity"] == "Debilitated":
+                factors.append(f"{label}'s Venus debilitated in D9 — conscious effort needed in romance.")
+                neg += 1
+
+    # 4. Jupiter dignity in D9 (especially bride — Jupiter = husband karaka)
+    bj = bride_d9.get("jupiter_d9")
+    if bj:
+        if bj["dignity"] in ["Exalted", "Own Sign"]:
+            factors.append(f"Bride's Jupiter strong in D9 ({bj['sign']}) — supportive husband indicated.")
+            pos += 1
+        elif bj["dignity"] == "Debilitated":
+            factors.append(f"Bride's Jupiter debilitated in D9 — husband may face challenges.")
+            neg += 1
+
+    net = pos - neg
+    if net >= 3:
+        assessment, adesc = "Strong", "D9 charts show strong marriage potential."
+    elif net >= 1:
+        assessment, adesc = "Moderate", "D9 charts show reasonable compatibility."
+    elif net == 0:
+        assessment, adesc = "Neutral", "D9 charts are neutral — neither strongly supportive nor adverse."
+    else:
+        assessment, adesc = "Weak", "D9 charts suggest areas needing remedial attention."
+
+    return {
+        "bride": bride_d9,
+        "groom": groom_d9,
+        "compatibility_factors": factors,
+        "assessment": assessment,
+        "assessment_description": adesc,
+        "positive_indicators": pos,
+        "negative_indicators": neg,
+    }
+
+
+# ═══════════════════════════════════════════════════════════════════════════ #
+# DASHA SYNCHRONIZATION CHECK
+# ═══════════════════════════════════════════════════════════════════════════ #
+
+# Dashas classified by marriage favorability
+_FAVORABLE_DASHAS: set[str] = {"Venus", "Jupiter", "Moon", "Mercury"}
+_CHALLENGING_DASHAS: set[str] = {"Saturn", "Rahu", "Ketu", "Sun"}
+
+
+def _check_dasha_compatibility(
+    bride_moon_lon: float, groom_moon_lon: float,
+    bride_birth_date: str, groom_birth_date: str,
+) -> dict:
+    """
+    Check Dasha timing compatibility for marriage.
+
+    Analyzes:
+        1. Current Mahadasha of both — favorable vs challenging
+        2. Dasha Sandhi warning — within 1 year of Mahadasha transition
+        3. Sama Dasha — same Mahadasha lord = compatibility bonus
+
+    Parameters:
+        bride_moon_lon:    Bride's Moon sidereal longitude
+        groom_moon_lon:    Groom's Moon sidereal longitude
+        bride_birth_date:  Bride's birth date string (YYYY-MM-DD)
+        groom_birth_date:  Groom's birth date string (YYYY-MM-DD)
+
+    Returns:
+        dict with current dashas, compatibility assessment, warnings
+
+    References:
+        Brihat Parashara Hora Shastra, Jataka Parijata
+    """
+    today_str = datetime.now().strftime("%Y-%m-%d")
+    today_dt = datetime.now()
+
+    def _find_current_dasha(moon_lon: float, birth_date: str) -> dict:
+        """Find the current Mahadasha and Antardasha at today's date."""
+        dasha_data = get_vimshottari_dasha(moon_lon, birth_date)
+        current_maha = None
+        current_antar = None
+        next_maha_start = None
+
+        for i, maha in enumerate(dasha_data["mahadashas"]):
+            m_start = datetime.strptime(maha["start_date"], "%Y-%m-%d")
+            m_end = datetime.strptime(maha["end_date"], "%Y-%m-%d")
+            if m_start <= today_dt <= m_end:
+                current_maha = maha
+                if i + 1 < len(dasha_data["mahadashas"]):
+                    next_maha_start = datetime.strptime(
+                        dasha_data["mahadashas"][i + 1]["start_date"], "%Y-%m-%d"
+                    )
+                for ad in maha.get("antardashas", []):
+                    ad_start = datetime.strptime(ad["start_date"], "%Y-%m-%d")
+                    ad_end = datetime.strptime(ad["end_date"], "%Y-%m-%d")
+                    if ad_start <= today_dt <= ad_end:
+                        current_antar = ad
+                        break
+                break
+
+        # Dasha Sandhi: within 1 year of transition
+        sandhi = False
+        if current_maha:
+            m_end = datetime.strptime(current_maha["end_date"], "%Y-%m-%d")
+            days_to_end = (m_end - today_dt).days
+            if days_to_end <= 365:
+                sandhi = True
+
+        return {
+            "mahadasha_lord": current_maha["lord"] if current_maha else "Unknown",
+            "mahadasha_end": current_maha["end_date"] if current_maha else None,
+            "antardasha_lord": current_antar["lord"] if current_antar else "Unknown",
+            "dasha_sandhi": sandhi,
+        }
+
+    bride_dasha = _find_current_dasha(bride_moon_lon, bride_birth_date)
+    groom_dasha = _find_current_dasha(groom_moon_lon, groom_birth_date)
+
+    # ── Analysis ──
+    warnings: list[str] = []
+    factors: list[str] = []
+
+    b_lord = bride_dasha["mahadasha_lord"]
+    g_lord = groom_dasha["mahadasha_lord"]
+
+    # Favorability
+    b_fav = b_lord in _FAVORABLE_DASHAS
+    g_fav = g_lord in _FAVORABLE_DASHAS
+    b_chal = b_lord in _CHALLENGING_DASHAS
+    g_chal = g_lord in _CHALLENGING_DASHAS
+
+    if b_fav and g_fav:
+        factors.append(f"Both in favorable Dashas ({b_lord} and {g_lord}) — excellent timing.")
+    elif b_fav or g_fav:
+        fav_who = "Bride" if b_fav else "Groom"
+        factors.append(f"{fav_who} in favorable Dasha — supportive timing for one partner.")
+    if b_chal:
+        warnings.append(f"Bride in {b_lord} Mahadasha — challenging period, needs care.")
+    if g_chal:
+        warnings.append(f"Groom in {g_lord} Mahadasha — challenging period, needs care.")
+
+    # Sama Dasha
+    if b_lord == g_lord:
+        factors.append(f"Sama Dasha ({b_lord}) — both in same period, shared energy.")
+
+    # Dasha Sandhi
+    if bride_dasha["dasha_sandhi"]:
+        warnings.append("Bride near Dasha Sandhi (transition) — turbulent transition period.")
+    if groom_dasha["dasha_sandhi"]:
+        warnings.append("Groom near Dasha Sandhi (transition) — turbulent transition period.")
+
+    # Overall
+    if not warnings and (b_fav or g_fav):
+        assessment = "Favorable"
+        adesc = "Dasha timing is supportive for marriage."
+    elif len(warnings) >= 2:
+        assessment = "Challenging"
+        adesc = "Both partners face Dasha-related challenges — consider timing remedies."
+    elif warnings:
+        assessment = "Mixed"
+        adesc = "One partner has timing concerns — manageable with awareness."
+    else:
+        assessment = "Neutral"
+        adesc = "Dasha timing is neither strongly favorable nor adverse."
+
+    return {
+        "bride_dasha": bride_dasha,
+        "groom_dasha": groom_dasha,
+        "factors": factors,
+        "warnings": warnings,
+        "assessment": assessment,
+        "assessment_description": adesc,
     }
 
 
@@ -934,25 +1439,30 @@ def compute_kundali_matching(
     groom_planets: dict,
     bride_asc_sid: float,
     groom_asc_sid: float,
+    bride_birth_date: str = None,
+    groom_birth_date: str = None,
 ) -> dict:
     """
     Compute complete Kundali Matching: Ashta Koota Milan (36 points)
-    + Vedha check + Manglik Dosha for both partners.
+    + Vedha check + Manglik Dosha + Navamsa D9 compatibility
+    + Dasha synchronization for both partners.
 
     This is the master orchestration function that calls all individual
     Koota computations, aggregates scores, and generates a final verdict.
 
     Parameters:
-        bride_moon_lon:  Bride's Moon sidereal longitude (degrees, float64)
-        groom_moon_lon:  Groom's Moon sidereal longitude (degrees, float64)
-        bride_planets:   Bride's planetary positions dict
-        groom_planets:   Groom's planetary positions dict
-        bride_asc_sid:   Bride's sidereal ascendant longitude (degrees)
-        groom_asc_sid:   Groom's sidereal ascendant longitude (degrees)
+        bride_moon_lon:    Bride's Moon sidereal longitude (degrees, float64)
+        groom_moon_lon:    Groom's Moon sidereal longitude (degrees, float64)
+        bride_planets:     Bride's planetary positions dict
+        groom_planets:     Groom's planetary positions dict
+        bride_asc_sid:     Bride's sidereal ascendant longitude (degrees)
+        groom_asc_sid:     Groom's sidereal ascendant longitude (degrees)
+        bride_birth_date:  Optional — Bride's birth date (YYYY-MM-DD) for Dasha
+        groom_birth_date:  Optional — Groom's birth date (YYYY-MM-DD) for Dasha
 
     Returns:
         Comprehensive matching result dict with 8 Koota scores, total,
-        Vedha status, Manglik Dosha for both, and interpretation.
+        Vedha status, Manglik Dosha, Navamsa compatibility, Dasha timing.
 
     References:
         Brihat Parashara Hora Shastra Ch. 79-80
@@ -970,15 +1480,25 @@ def compute_kundali_matching(
     b_rashi_idx: int = bride_rashi["index"] - 1  # RASHIS uses 1-based index
     g_rashi_idx: int = groom_rashi["index"] - 1
 
-    # ── Compute all 8 Kootas ──
+    # Pada values (1-4) from Nakshatra data
+    b_pada: int = bride_nak.get("pada", None)
+    g_pada: int = groom_nak.get("pada", None)
+
+    # ── Compute all 8 Kootas (with enhanced cancellation) ──
     varna = calc_varna_koota(b_rashi_idx, g_rashi_idx)
     vashya = calc_vashya_koota(b_rashi_idx, g_rashi_idx)
     tara = calc_tara_koota(b_nak_idx, g_nak_idx)
     yoni = calc_yoni_koota(b_nak_idx, g_nak_idx)
     graha_maitri = calc_graha_maitri_koota(b_rashi_idx, g_rashi_idx)
     gana = calc_gana_koota(b_nak_idx, g_nak_idx)
-    bhakoot = calc_bhakoot_koota(b_rashi_idx, g_rashi_idx)
-    nadi = calc_nadi_koota(b_nak_idx, g_nak_idx, b_rashi_idx, g_rashi_idx)
+    bhakoot = calc_bhakoot_koota(
+        b_rashi_idx, g_rashi_idx,
+        bride_moon_lon=bride_moon_lon, groom_moon_lon=groom_moon_lon,
+    )
+    nadi = calc_nadi_koota(
+        b_nak_idx, g_nak_idx, b_rashi_idx, g_rashi_idx,
+        bride_pada=b_pada, groom_pada=g_pada,
+    )
 
     # ── Total Score ──
     total_points: float = (
@@ -1026,6 +1546,19 @@ def compute_kundali_matching(
         bride_manglik["double_manglik_cancellation"] = True
         groom_manglik["double_manglik_cancellation"] = True
 
+    # ── Navamsa (D9) Compatibility ──
+    navamsa_compat = _analyze_navamsa_compatibility(
+        bride_planets, groom_planets, bride_asc_sid, groom_asc_sid
+    )
+
+    # ── Dasha Synchronization ──
+    dasha_compat = None
+    if bride_birth_date and groom_birth_date:
+        dasha_compat = _check_dasha_compatibility(
+            bride_moon_lon, groom_moon_lon,
+            bride_birth_date, groom_birth_date,
+        )
+
     # ── Generate conclusion ──
     warnings: list[str] = []
     if total_points < 18:
@@ -1033,13 +1566,19 @@ def compute_kundali_matching(
     if vedha.get("has_vedha"):
         warnings.append("Vedha Dosha is present — Nakshatras are mutually afflicting.")
     if bride_manglik.get("is_manglik") and not bride_manglik.get("is_cancelled") and not both_manglik:
-        warnings.append("Bride has uncancelled Manglik Dosha.")
+        strength = bride_manglik.get("strength", "")
+        warnings.append(f"Bride has uncancelled Manglik Dosha ({strength}).")
     if groom_manglik.get("is_manglik") and not groom_manglik.get("is_cancelled") and not both_manglik:
-        warnings.append("Groom has uncancelled Manglik Dosha.")
+        strength = groom_manglik.get("strength", "")
+        warnings.append(f"Groom has uncancelled Manglik Dosha ({strength}).")
     if nadi.get("dosha_present") and not nadi.get("dosha_cancelled"):
         warnings.append("Nadi Dosha is present — health/progeny concerns indicated.")
     if bhakoot.get("dosha_present") and not bhakoot.get("dosha_cancelled"):
         warnings.append("Bhakoot Dosha is present — emotional/family challenges indicated.")
+    if navamsa_compat.get("assessment") == "Weak":
+        warnings.append("Navamsa (D9) compatibility is weak — remedial measures advised.")
+    if dasha_compat and dasha_compat.get("assessment") == "Challenging":
+        warnings.append("Dasha timing is challenging for both — consider timing remedies.")
 
     if not warnings:
         conclusion = f"Match score: {total_points}/{max_points} ({level}). {level_desc} No major doshas detected."
@@ -1049,7 +1588,7 @@ def compute_kundali_matching(
             f"Warnings: {'; '.join(warnings)}"
         )
 
-    return {
+    result = {
         "bride": {
             "nakshatra": bride_nak,
             "rashi": bride_rashi,
@@ -1080,6 +1619,13 @@ def compute_kundali_matching(
             "groom": groom_manglik,
             "both_manglik_cancellation": both_manglik,
         },
+        "navamsa_compatibility": navamsa_compat,
         "warnings": warnings,
         "conclusion": conclusion,
     }
+
+    if dasha_compat is not None:
+        result["dasha_compatibility"] = dasha_compat
+
+    return result
+

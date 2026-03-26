@@ -305,6 +305,8 @@ async def compute_matching(data: MatchingData):
             groom_planets=groom_planets,
             bride_asc_sid=bride_asc,
             groom_asc_sid=groom_asc,
+            bride_birth_date=data.bride.date,
+            groom_birth_date=data.groom.date,
         )
 
         return sanitize_numpy(result)
