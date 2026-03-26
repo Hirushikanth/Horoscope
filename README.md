@@ -1,13 +1,13 @@
-# Jyotisha — Precision Vedic Astrology Engine
+# Jyotisha — Precision Vedic Astrology Engine & Dashboard
 
-Jyotisha is a high-precision backend engine for Vedic astrology calculations. It leverages the **NASA JPL DE440 ephemeris** via the Skyfield library to provide sub-arcsecond accuracy for planetary positions, ensuring that all Jyotisha (Vedic astrology) algorithms are based on the most accurate astronomical data available.
+Jyotisha is a high-precision Vedic astrology platform. It features a robust **FastAPI backend** that leverages the **NASA JPL DE440 ephemeris** via the Skyfield library for sub-arcsecond accuracy, and a **React-based dashboard** for intuitive visualization of planetary positions, charts, and dashas.
 
 ## 🌟 Key Features
 
 - **Scientific Precision**: Uses IEEE 754 float64 precision throughout all calculations.
 - **NASA JPL DE440**: Backed by the latest planetary ephemeris (covering 1550 to 2650 AD).
 - **Vedic Algorithms**: Full implementation of traditional Jyotisha systems:
-  - **Nakshatras**: 27 lunar mansions with detailed attributes (Deity, Gana, Animal, etc.).
+  - **Nakshatras**: 27 lunar mansions with detailed attributes.
   - **Rashis**: 12 zodiac signs with lordships and elements.
   - **Bhavas**: Equal house system calculations.
   - **Vimshottari Dasha**: 120-year planetary period cycle calculations.
@@ -15,62 +15,83 @@ Jyotisha is a high-precision backend engine for Vedic astrology calculations. It
   - **Dignities**: Planetary strengths (Exaltation, Debilitation, Moolatrikona).
   - **Yogas**: Detection of important planetary combinations.
 - **Sidereal Calculations**: Lahiri (Chitra Paksha) Ayanamsa by default.
+- **Interactive UI**: Glassmorphic dashboard with dynamic Kundli charts and timelines.
 
 ## 🛠️ Tech Stack
 
+### Backend
 - **Language**: Python 3.10+
 - **Framework**: [FastAPI](https://fastapi.tiangolo.com/)
 - **Astronomy**: [Skyfield](https://rhodesmill.org/skyfield/)
 - **Mathematics**: NumPy
 - **Server**: Uvicorn
 
+### Frontend
+- **Framework**: React 19 (TypeScript + Vite)
+- **Styling**: Tailwind CSS 4, Framer Motion (Animations)
+- **State Management**: Zustand
+- **Data Fetching**: TanStack Query, Axios
+
 ## 📂 Project Structure
 
 ```text
-backend/
-├── data/               # Ephemeris files (JPL DE440)
-├── tests/              # Unit tests for astrology logic
-├── api.py              # FastAPI routes and Pydantic models
-├── ephemeris.py        # Core astronomical computations
-├── main.py             # Application entry point
-├── requirements.txt    # Python dependencies
-├── stars.py            # Fixed star calculations
-└── vedic.py            # Vedic astrology algorithms
+├── backend/            # Python FastAPI backend
+│   ├── data/           # Ephemeris files (JPL DE440)
+│   ├── tests/          # Unit tests for astrology logic
+│   ├── api.py          # FastAPI routes and Pydantic models
+│   ├── ephemeris.py    # Core astronomical computations
+│   ├── main.py         # Application entry point
+│   ├── requirements.txt # Python dependencies
+│   └── vedic.py        # Vedic astrology algorithms
+└── frontend/           # React + Vite frontend
+    ├── src/            # Application source code
+    ├── public/         # Static assets
+    └── package.json    # Node dependencies and scripts
 ```
 
 ## 🚀 Getting Started
 
 ### Prerequisites
 
-- Python 3.10 or higher
-- `pip` or `uv`
+- **Backend**: Python 3.10 or higher, `pip` or `uv`
+- **Frontend**: Node.js 18+ and `npm`
 
-### Installation
+### Installation & Setup
 
 1. **Clone the repository**:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/Hirushikanth/Horoscope
    cd horoscope-enhanced
    ```
 
-2. **Set up a virtual environment**:
+2. **Backend Setup**:
    ```bash
+   # Create and activate virtual environment
    python -m venv .venv
    source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-   ```
 
-3. **Install dependencies**:
-   ```bash
+   # Install dependencies
    pip install -r backend/requirements.txt
-   ```
 
-4. **Run the API server**:
-   ```bash
+   # Run the API server
    cd backend
    python3 -m uvicorn main:app --host 127.0.0.1 --port 8000
    ```
 
-The API will be available at `http://127.0.0.1:8000`. You can view the interactive documentation at `http://127.0.0.1:8000/docs`.
+3. **Frontend Setup**:
+   ```bash
+   # Navigate to frontend directory
+   cd ../frontend
+
+   # Install dependencies
+   npm install
+
+   # Run the development server
+   npm run dev
+   ```
+
+The Backend will be at `http://127.0.0.1:8000`.
+The Frontend will be at `http://localhost:5173`.
 
 ## 📡 API Endpoints
 

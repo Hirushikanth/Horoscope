@@ -31,6 +31,7 @@ from vedic import (
     get_bhava, get_planetary_dignity, get_navamsa,
     get_vimshottari_dasha, DASHA_SEQUENCE, DASHA_YEARS,
     OWN_SIGNS, EXALTATION, DEBILITATION,
+    DEEP_EXALTATION_DEG, DEEP_DEBILITATION_DEG,
 )
 
 
@@ -1559,6 +1560,11 @@ def compute_kundali_matching(
             bride_birth_date, groom_birth_date,
         )
 
+    # ── Lagna-Chart Synthesis ──
+    lagna_compat = _synthesize_lagna_analysis(
+        bride_planets, groom_planets, bride_asc_sid, groom_asc_sid
+    )
+
     # ── Generate conclusion ──
     warnings: list[str] = []
     if total_points < 18:
@@ -1579,6 +1585,10 @@ def compute_kundali_matching(
         warnings.append("Navamsa (D9) compatibility is weak — remedial measures advised.")
     if dasha_compat and dasha_compat.get("assessment") == "Challenging":
         warnings.append("Dasha timing is challenging for both — consider timing remedies.")
+
+    # Combine lagna warnings
+    if lagna_compat.get("lagna_warnings"):
+        warnings.extend(lagna_compat["lagna_warnings"])
 
     if not warnings:
         conclusion = f"Match score: {total_points}/{max_points} ({level}). {level_desc} No major doshas detected."
@@ -1620,6 +1630,7 @@ def compute_kundali_matching(
             "both_manglik_cancellation": both_manglik,
         },
         "navamsa_compatibility": navamsa_compat,
+        "lagna_analysis": lagna_compat,
         "warnings": warnings,
         "conclusion": conclusion,
     }
@@ -1629,3 +1640,593 @@ def compute_kundali_matching(
 
     return result
 
+
+# ═══════════════════════════════════════════════════════════════════════════ #
+# LAGNA ANALYSIS — 7th House & Lord
+# ═══════════════════════════════════════════════════════════════════════════ #
+
+# Planets classified by natural benefic/malefic nature
+_NATURAL_BENEFICS: frozenset[str] = frozenset({"Jupiter", "Venus", "Moon", "Mercury"})
+_NATURAL_MALEFICS: frozenset[str] = frozenset({"Sun", "Mars", "Saturn", "Rahu", "Ketu"})
+
+
+def _analyze_seventh_house(planets: dict, asc_sid: float, label: str) -> dict:
+    """
+    Analyze the 7th house (Saptama Bhava) and its lord for marriage indicators.
+
+    Examines:
+        - Occupants of the 7th house (benefic/malefic classification)
+        - 7th lord: house placement, sign, dignity, retrograde status
+        - Whether Jupiter or Venus aspects the 7th house (protective)
+        - Whether Saturn, Mars, Rahu, Ketu afflict or occupy the 7th
+
+    References:
+        Brihat Parashara Hora Shastra Ch. 18, Phaldeepika Ch. 14
+    """
+    asc_idx = int(np.float64(asc_sid) % np.float64(360.0) / np.float64(30.0))
+    h7_sign_idx = (asc_idx + 6) % 12
+    h7_lord = RASHIS[h7_sign_idx]["lord"]
+
+    # ── 7th house occupants ──
+    occupants: list[dict] = []
+    for pname, pdata in planets.items():
+        if pname.startswith("_"):
+            continue
+        p_lon = np.float64(pdata.get("sidereal_longitude", 0.0))
+        p_sign = int(p_lon % np.float64(360.0) / np.float64(30.0))
+        if p_sign == h7_sign_idx:
+            nature = "Benefic" if pname in _NATURAL_BENEFICS else "Malefic"
+            occupants.append({"planet": pname, "nature": nature})
+
+    benefic_occs = [o["planet"] for o in occupants if o["nature"] == "Benefic"]
+    malefic_occs = [o["planet"] for o in occupants if o["nature"] == "Malefic"]
+
+    # ── 7th lord placement ──
+    lord_info: dict = {"lord": h7_lord, "house": None, "sign": None,
+                       "dignity": None, "retrograde": False}
+    if h7_lord in planets:
+        lord_lon = np.float64(planets[h7_lord].get("sidereal_longitude", 0.0))
+        lord_sign_idx = int(lord_lon % np.float64(360.0) / np.float64(30.0))
+        lord_house = (lord_sign_idx - asc_idx) % 12 + 1
+        lord_dignity = get_planetary_dignity(h7_lord, float(lord_lon))
+        lord_info.update({
+            "house": lord_house,
+            "sign": RASHIS[lord_sign_idx]["name"],
+            "dignity": lord_dignity.get("status"),
+            "retrograde": planets[h7_lord].get("retrograde", False),
+        })
+
+    # ── Benefic aspects on 7th house ──
+    benefic_aspects: list[str] = []
+    for benefic in ["Jupiter", "Venus"]:
+        if benefic not in planets:
+            continue
+        b_lon = np.float64(planets[benefic].get("sidereal_longitude", 0.0))
+        b_sign = int(b_lon % np.float64(360.0) / np.float64(30.0))
+        # Jupiter: 5th, 7th, 9th; Venus: 7th only (standard aspect)
+        aspect_houses = [5, 7, 9] if benefic == "Jupiter" else [7]
+        for ah in aspect_houses:
+            target_sign = (b_sign + ah - 1) % 12
+            if target_sign == h7_sign_idx and b_sign != h7_sign_idx:
+                benefic_aspects.append(
+                    f"{benefic} aspects 7th from {RASHIS[b_sign]['name']} — protective influence."
+                )
+                break
+
+    # ── Malefic afflictions ──
+    afflictions: list[str] = []
+    for mal in ["Saturn", "Mars", "Rahu", "Ketu", "Sun"]:
+        if mal not in planets:
+            continue
+        m_lon = np.float64(planets[mal].get("sidereal_longitude", 0.0))
+        m_sign = int(m_lon % np.float64(360.0) / np.float64(30.0))
+        target_7th = (m_sign + 6) % 12
+        if m_sign == h7_sign_idx:
+            afflictions.append(f"{mal} occupies the 7th house — caution for marriage.")
+        elif target_7th == h7_sign_idx and mal in ["Saturn", "Mars"]:
+            afflictions.append(f"{mal} aspects 7th house — may create tension.")
+
+    # 7th lord in dusthana
+    lord_house_val = lord_info.get("house")
+    if lord_house_val in [6, 8, 12]:
+        afflictions.append(
+            f"7th lord {h7_lord} in house {lord_house_val} (Dusthana) — challenges for partnership."
+        )
+
+    # ── Assessment ──
+    positive = len(benefic_aspects) + len(benefic_occs)
+    negative = len(malefic_occs) + len(afflictions)
+    if positive > negative + 1:
+        assessment = "Strong"
+        adesc = f"{label}'s 7th house shows strong marriage potential."
+    elif negative > positive + 1:
+        assessment = "Afflicted"
+        adesc = f"{label}'s 7th house has notable afflictions — remedial awareness advised."
+    else:
+        assessment = "Mixed"
+        adesc = f"{label}'s 7th house shows a mixed picture."
+
+    return {
+        "seventh_house_sign": RASHIS[h7_sign_idx]["name"],
+        "seventh_lord": lord_info,
+        "benefic_occupants": benefic_occs,
+        "malefic_occupants": malefic_occs,
+        "benefic_aspects": benefic_aspects,
+        "afflictions": afflictions,
+        "assessment": assessment,
+        "assessment_description": adesc,
+    }
+
+
+# ═══════════════════════════════════════════════════════════════════════════ #
+# LAGNA ANALYSIS — Venus Karaka (Groom) & Jupiter Karaka (Bride)
+# ═══════════════════════════════════════════════════════════════════════════ #
+
+def _analyze_venus_karaka(planets: dict, asc_sid: float) -> dict:
+    """
+    Analyze Venus as the karaka (significator) of marriage for the groom.
+
+    Venus represents wife, romance, sensuality, and conjugal happiness.
+    A strong, unafflicted Venus promises a harmonious marriage.
+
+    Checks:
+        - House and sign, dignity
+        - Combustion (within 8° of Sun) → weakened karaka
+        - Dusthana (6/8/12) → warning
+        - Retrograde, conjunctions
+
+    References:
+        BPHS Ch. 23, Phaldeepika Ch. 6
+    """
+    venus_data = planets.get("Venus")
+    if venus_data is None:
+        return {"available": False, "description": "Venus data not available."}
+
+    asc_idx = int(np.float64(asc_sid) % np.float64(360.0) / np.float64(30.0))
+    v_lon = np.float64(venus_data.get("sidereal_longitude", 0.0))
+    v_sign = int(v_lon % np.float64(360.0) / np.float64(30.0))
+    v_house = (v_sign - asc_idx) % 12 + 1
+    v_dignity = get_planetary_dignity("Venus", float(v_lon))
+    v_retrograde: bool = venus_data.get("retrograde", False)
+
+    observations: list[str] = []
+    warnings: list[str] = []
+    dignity_status = v_dignity.get("status", "Neutral")
+
+    if dignity_status in ("Exalted", "Moolatrikona", "Own Sign"):
+        observations.append(f"Venus {dignity_status} in {RASHIS[v_sign]['name']} — excellent karaka strength.")
+    elif dignity_status == "Debilitated":
+        warnings.append(f"Venus debilitated in {RASHIS[v_sign]['name']} — marriage karaka weakened.")
+
+    # Combustion check
+    sun_data = planets.get("Sun")
+    if sun_data:
+        s_lon = np.float64(sun_data.get("sidereal_longitude", 0.0))
+        diff = float(abs(v_lon - s_lon) % np.float64(360.0))
+        if diff > 180.0:
+            diff = 360.0 - diff
+        if diff <= 8.0:
+            warnings.append(f"Venus combust (within {diff:.1f}° of Sun) — natural significations weakened.")
+
+    if v_house in [6, 8, 12]:
+        warnings.append(f"Venus in house {v_house} (Dusthana) — relationship challenges indicated.")
+    if v_retrograde:
+        observations.append("Venus retrograde — deep, karmic bond with spouse; internalized love.")
+
+    for pname, pdata in planets.items():
+        if pname in ("Venus",) or pname.startswith("_"):
+            continue
+        p_lon = np.float64(pdata.get("sidereal_longitude", 0.0))
+        p_sign = int(p_lon % np.float64(360.0) / np.float64(30.0))
+        if p_sign == v_sign:
+            if pname in _NATURAL_BENEFICS:
+                observations.append(f"{pname} conjoins Venus — enriches marital happiness.")
+            elif pname in _NATURAL_MALEFICS and pname != "Sun":
+                warnings.append(f"{pname} conjoins Venus — may introduce tension in romance.")
+
+    score = len(observations) - len(warnings)
+    if dignity_status == "Debilitated" or v_house == 8:
+        assessment = "Weak"
+    elif score >= 2 or dignity_status in ("Exalted", "Own Sign", "Moolatrikona"):
+        assessment = "Strong"
+    elif warnings:
+        assessment = "Mixed"
+    else:
+        assessment = "Moderate"
+
+    return {
+        "available": True,
+        "house": v_house,
+        "sign": RASHIS[v_sign]["name"],
+        "dignity": dignity_status,
+        "retrograde": v_retrograde,
+        "assessment": assessment,
+        "observations": observations,
+        "warnings": warnings,
+    }
+
+
+def _analyze_jupiter_karaka(planets: dict, asc_sid: float) -> dict:
+    """
+    Analyze Jupiter as the karaka (significator) of marriage for the bride.
+
+    Jupiter (Devaguru) represents husband, righteous partnership, and
+    marital bliss from the female chart.
+
+    Checks:
+        - House, sign, dignity
+        - Dusthana, retrograde
+        - Jupiter's 5th/7th/9th aspect on 7th house (protective)
+        - Malefic conjunctions
+
+    References:
+        BPHS Ch. 23, Jataka Parijata
+    """
+    jup_data = planets.get("Jupiter")
+    if jup_data is None:
+        return {"available": False, "description": "Jupiter data not available."}
+
+    asc_idx = int(np.float64(asc_sid) % np.float64(360.0) / np.float64(30.0))
+    j_lon = np.float64(jup_data.get("sidereal_longitude", 0.0))
+    j_sign = int(j_lon % np.float64(360.0) / np.float64(30.0))
+    j_house = (j_sign - asc_idx) % 12 + 1
+    j_dignity = get_planetary_dignity("Jupiter", float(j_lon))
+    j_retrograde: bool = jup_data.get("retrograde", False)
+    h7_sign_idx = (asc_idx + 6) % 12
+
+    observations: list[str] = []
+    warnings: list[str] = []
+    dignity_status = j_dignity.get("status", "Neutral")
+
+    if dignity_status in ("Exalted", "Moolatrikona", "Own Sign"):
+        observations.append(f"Jupiter {dignity_status} in {RASHIS[j_sign]['name']} — strong husband karaka.")
+    elif dignity_status == "Debilitated":
+        warnings.append(f"Jupiter debilitated in {RASHIS[j_sign]['name']} — husband karaka weakened.")
+
+    if j_house in [6, 8, 12]:
+        warnings.append(f"Jupiter in house {j_house} (Dusthana) — challenges with husband karaka.")
+    if j_retrograde:
+        observations.append("Jupiter retrograde — powerful but past-karma influence on marriage.")
+    if j_house in [1, 4, 5, 7, 9, 10]:
+        observations.append(f"Jupiter in house {j_house} — auspicious position for marital happiness.")
+
+    # 7th house aspect
+    for ah in [5, 7, 9]:
+        target = (j_sign + ah - 1) % 12
+        if target == h7_sign_idx and j_sign != h7_sign_idx:
+            observations.append(f"Jupiter aspects 7th from {RASHIS[j_sign]['name']} — blesses marriage.")
+            break
+
+    for pname, pdata in planets.items():
+        if pname in ("Jupiter",) or pname.startswith("_"):
+            continue
+        p_lon = np.float64(pdata.get("sidereal_longitude", 0.0))
+        p_sign = int(p_lon % np.float64(360.0) / np.float64(30.0))
+        if p_sign == j_sign and pname in _NATURAL_MALEFICS:
+            warnings.append(f"{pname} conjoins Jupiter — may afflict husband karaka.")
+
+    score = len(observations) - len(warnings)
+    if dignity_status == "Debilitated" or j_house == 8:
+        assessment = "Weak"
+    elif score >= 2 or dignity_status in ("Exalted", "Own Sign", "Moolatrikona"):
+        assessment = "Strong"
+    elif warnings:
+        assessment = "Mixed"
+    else:
+        assessment = "Moderate"
+
+    return {
+        "available": True,
+        "house": j_house,
+        "sign": RASHIS[j_sign]["name"],
+        "dignity": dignity_status,
+        "retrograde": j_retrograde,
+        "assessment": assessment,
+        "observations": observations,
+        "warnings": warnings,
+    }
+
+
+# ═══════════════════════════════════════════════════════════════════════════ #
+# LAGNA ANALYSIS — Upapada Lagna (Jaimini Sutras)
+# ═══════════════════════════════════════════════════════════════════════════ #
+
+def _calculate_upapada_lagna(planets: dict, asc_sid: float) -> dict:
+    """
+    Calculate the Upapada Lagna (UL) — the Arudha Pada of the 12th house.
+
+    The UL is the second most important Arudha after Arudha Lagna.
+    It reveals the spouse's nature, the quality of marital life, and
+    relationship endurance.
+
+    Calculation (Jaimini Sutras):
+        1. Identify the 12th house sign and its lord
+        2. Count houses from 12th to lord → n
+        3. Count n houses forward from lord → Upapada Lagna
+
+    Special exceptions:
+        - 12th lord in 12th itself → UL = 9th from 12th
+        - n = 3 or 9 → UL = 3rd from 12th (Jaimini rule)
+
+    References:
+        Jaimini Sutras 2.3.10-15; Kalyana Varma Saravali Ch. 41
+    """
+    asc_idx = int(np.float64(asc_sid) % np.float64(360.0) / np.float64(30.0))
+    h12_sign_idx = (asc_idx + 11) % 12
+    h12_lord = RASHIS[h12_sign_idx]["lord"]
+
+    if h12_lord not in planets:
+        return {
+            "available": False,
+            "description": f"12th lord ({h12_lord}) data unavailable for Upapada calculation.",
+        }
+
+    lord_lon = np.float64(planets[h12_lord].get("sidereal_longitude", 0.0))
+    lord_sign_idx = int(lord_lon % np.float64(360.0) / np.float64(30.0))
+    lord_house = (lord_sign_idx - asc_idx) % 12 + 1
+
+    n = (lord_house - 12) % 12
+    if n == 0:
+        n = 12
+
+    ul_sign_idx = (lord_sign_idx + n - 1) % 12
+
+    # Exception: 12th lord in 12th → 9th from 12th
+    if lord_house == 12:
+        ul_sign_idx = (h12_sign_idx + 8) % 12
+    # Jaimini: 3 or 9 separation → 3rd from 12th
+    elif n in [3, 9]:
+        ul_sign_idx = (h12_sign_idx + 2) % 12
+
+    ul_lord = RASHIS[ul_sign_idx]["lord"]
+    ul_house = (ul_sign_idx - asc_idx) % 12 + 1
+    ul_2nd_idx = (ul_sign_idx + 1) % 12
+
+    ul_occupants: list[str] = []
+    ul_2nd_occupants: list[str] = []
+    malefics_on_ul: list[str] = []
+    benefics_on_ul: list[str] = []
+
+    for pname, pdata in planets.items():
+        if pname.startswith("_"):
+            continue
+        p_lon = np.float64(pdata.get("sidereal_longitude", 0.0))
+        p_sign = int(p_lon % np.float64(360.0) / np.float64(30.0))
+        if p_sign == ul_sign_idx:
+            ul_occupants.append(pname)
+            (malefics_on_ul if pname in _NATURAL_MALEFICS else benefics_on_ul).append(pname)
+        if p_sign == ul_2nd_idx:
+            ul_2nd_occupants.append(pname)
+
+    observations: list[str] = []
+    warnings: list[str] = []
+
+    if benefics_on_ul:
+        observations.append(f"Benefic ({', '.join(benefics_on_ul)}) on UL — auspicious spouse and marriage.")
+    if malefics_on_ul:
+        sev = any(m in malefics_on_ul for m in ["Rahu", "Saturn"])
+        warnings.append(
+            f"Malefic ({', '.join(malefics_on_ul)}) on UL — "
+            + ("risk of separation or delay." if sev else "some marital friction.")
+        )
+
+    ul_lord_dignity = {"status": "Unknown"}
+    if ul_lord in planets:
+        ul_lord_lon = float(np.float64(planets[ul_lord].get("sidereal_longitude", 0.0)))
+        ul_lord_dignity = get_planetary_dignity(ul_lord, ul_lord_lon)
+    if ul_lord_dignity.get("status") in ("Exalted", "Own Sign", "Moolatrikona"):
+        observations.append(f"UL lord ({ul_lord}) strong — enduring marital bond.")
+    elif ul_lord_dignity.get("status") == "Debilitated":
+        warnings.append(f"UL lord ({ul_lord}) debilitated — quality of marriage needs attention.")
+
+    assessment = (
+        "Strong" if len(observations) > len(warnings) else
+        "Afflicted" if len(warnings) > len(observations) else "Neutral"
+    )
+
+    return {
+        "available": True,
+        "ul_sign": RASHIS[ul_sign_idx]["name"],
+        "ul_house": ul_house,
+        "ul_lord": ul_lord,
+        "ul_lord_dignity": ul_lord_dignity.get("status"),
+        "twelfth_lord": h12_lord,
+        "twelfth_lord_house": lord_house,
+        "ul_occupants": ul_occupants,
+        "ul_2nd_house_occupants": ul_2nd_occupants,
+        "benefics_on_ul": benefics_on_ul,
+        "malefics_on_ul": malefics_on_ul,
+        "observations": observations,
+        "warnings": warnings,
+        "assessment": assessment,
+    }
+
+
+# ═══════════════════════════════════════════════════════════════════════════ #
+# LAGNA ANALYSIS — Marriage Shadbala (Focused Subset)
+# ═══════════════════════════════════════════════════════════════════════════ #
+
+_DIG_BALA_HOUSE: dict[str, int] = {
+    "Sun": 10, "Mars": 10,
+    "Moon": 4, "Venus": 4,
+    "Mercury": 1, "Jupiter": 1,
+    "Saturn": 7,
+}
+
+
+def _compute_marriage_shadbala(
+    planets: dict,
+    asc_sid: float,
+    seventh_house_lord: str,
+) -> dict:
+    """
+    Compute focused Shadbala for Venus, Jupiter, and the 7th lord.
+
+    Components (marriage-relevant subset of 6):
+        1. Uccha Bala   — proximity to deep exaltation (0–60 Virupas)
+        2. Dig Bala     — directional house strength (0–60 Virupas)
+        3. Kendradi Bala — Kendra/Panaphara/Apoklima (60/30/15 Virupas)
+
+    Threshold (max 180):  Strong ≥ 120,  Moderate ≥ 70,  Weak < 70
+
+    References:
+        BPHS Ch. 27-35 (Shadbala Adhyaya), Phaldeepika Ch. 3
+    """
+    asc_idx = int(np.float64(asc_sid) % np.float64(360.0) / np.float64(30.0))
+
+    def kendradi(h: int) -> float:
+        if h in [1, 4, 7, 10]:
+            return 60.0
+        if h in [2, 5, 8, 11]:
+            return 30.0
+        return 15.0
+
+    target_planets = list({seventh_house_lord, "Venus", "Jupiter"})
+    results: dict[str, dict] = {}
+
+    for pname in target_planets:
+        if pname not in planets or pname in ("Rahu", "Ketu"):
+            results[pname] = {"available": False}
+            continue
+
+        p_lon = float(np.float64(planets[pname].get("sidereal_longitude", 0.0)) % np.float64(360.0))
+        p_sign = int(p_lon / 30.0)
+        p_house = (p_sign - asc_idx) % 12 + 1
+
+        # Uccha Bala
+        if pname in DEEP_DEBILITATION_DEG:
+            db_deg = DEEP_DEBILITATION_DEG[pname]
+            dist = (p_lon - db_deg) % 360.0
+            if dist > 180.0:
+                dist = 360.0 - dist
+            uccha = min(float(np.float64(dist) / np.float64(3.0)), 60.0)
+        else:
+            uccha = 30.0
+
+        # Dig Bala
+        if pname in _DIG_BALA_HOUSE:
+            peak = _DIG_BALA_HOUSE[pname]
+            diff = abs(p_house - peak)
+            if diff > 6:
+                diff = 12 - diff
+            dig = max(float(np.float64(60.0) - np.float64(diff) * np.float64(10.0)), 0.0)
+        else:
+            dig = 30.0
+
+        kend = kendradi(p_house)
+        total = uccha + dig + kend
+
+        strength_label = "Strong" if total >= 120.0 else "Moderate" if total >= 70.0 else "Weak"
+
+        results[pname] = {
+            "available": True,
+            "house": p_house,
+            "sign": RASHIS[p_sign]["name"],
+            "dignity": get_planetary_dignity(pname, p_lon).get("status", "Neutral"),
+            "uccha_bala": round(uccha, 2),
+            "dig_bala": round(dig, 2),
+            "kendradi_bala": round(kend, 2),
+            "total_virupas": round(total, 2),
+            "max_virupas": 180.0,
+            "strength": strength_label,
+        }
+
+    strong_count = sum(1 for v in results.values() if v.get("strength") == "Strong")
+    weak_count = sum(1 for v in results.values() if v.get("strength") == "Weak")
+    if strong_count >= 2:
+        overall, odesc = "Strong", "Marriage planets well-fortified — stable union supported."
+    elif weak_count >= 2:
+        overall, odesc = "Weak", "Marriage planets show weakness — awareness and remedies advisable."
+    else:
+        overall, odesc = "Moderate", "Marriage planets show moderate strength."
+
+    return {
+        "planets": results,
+        "overall": overall,
+        "overall_description": odesc,
+        "components_computed": ["Uccha Bala", "Dig Bala", "Kendradi Bala"],
+        "note": (
+            "Full Shadbala omits Kala, Cheshta, and Drik Bala "
+            "(require birth time and ephemeris speed data)."
+        ),
+    }
+
+
+# ═══════════════════════════════════════════════════════════════════════════ #
+# LAGNA ANALYSIS — Cross-Chart Synthesis Orchestrator
+# ═══════════════════════════════════════════════════════════════════════════ #
+
+def _synthesize_lagna_analysis(
+    bride_planets: dict, groom_planets: dict,
+    bride_asc_sid: float, groom_asc_sid: float,
+) -> dict:
+    """
+    Orchestrate all Lagna-based marriage analyses for both partners.
+
+    Returns a unified dict with 7th house, karaka, Upapada Lagna,
+    Shadbala, cross-chart notes, and aggregated warnings.
+    """
+    bride_7th = _analyze_seventh_house(bride_planets, bride_asc_sid, "Bride")
+    groom_7th = _analyze_seventh_house(groom_planets, groom_asc_sid, "Groom")
+
+    venus_karaka = _analyze_venus_karaka(groom_planets, groom_asc_sid)
+    jupiter_karaka = _analyze_jupiter_karaka(bride_planets, bride_asc_sid)
+
+    bride_ul = _calculate_upapada_lagna(bride_planets, bride_asc_sid)
+    groom_ul = _calculate_upapada_lagna(groom_planets, groom_asc_sid)
+
+    bride_asc_idx = int(np.float64(bride_asc_sid) % np.float64(360.0) / np.float64(30.0))
+    groom_asc_idx = int(np.float64(groom_asc_sid) % np.float64(360.0) / np.float64(30.0))
+    bride_7th_lord = RASHIS[(bride_asc_idx + 6) % 12]["lord"]
+    groom_7th_lord = RASHIS[(groom_asc_idx + 6) % 12]["lord"]
+
+    bride_shadbala = _compute_marriage_shadbala(bride_planets, bride_asc_sid, bride_7th_lord)
+    groom_shadbala = _compute_marriage_shadbala(groom_planets, groom_asc_sid, groom_7th_lord)
+
+    # Cross-chart UL notes
+    cross_ul_notes: list[str] = []
+    if bride_ul.get("available") and groom_ul.get("available"):
+        b_ul_sign = bride_ul.get("ul_sign", "")
+        g_ul_sign = groom_ul.get("ul_sign", "")
+        if b_ul_sign == g_ul_sign:
+            cross_ul_notes.append("Both UL in same sign — strong shared destiny in marriage.")
+        b_ul_lord = bride_ul.get("ul_lord", "")
+        g_ul_lord = groom_ul.get("ul_lord", "")
+        if b_ul_lord and g_ul_lord:
+            ul_f = _get_graha_friendship(b_ul_lord, g_ul_lord)
+            if ul_f >= 1:
+                cross_ul_notes.append(
+                    f"UL lords ({b_ul_lord} ↔ {g_ul_lord}) are friends — harmonious marriage karma."
+                )
+            elif ul_f <= -1:
+                cross_ul_notes.append(
+                    f"UL lords ({b_ul_lord} ↔ {g_ul_lord}) have enmity — karmic friction possible."
+                )
+
+    # Aggregate warnings
+    lagna_warnings: list[str] = []
+    for lbl, h7 in [("Bride", bride_7th), ("Groom", groom_7th)]:
+        if h7["assessment"] == "Afflicted":
+            lagna_warnings.append(f"{lbl}'s 7th house is afflicted — Lagna chart caution.")
+    if venus_karaka.get("assessment") == "Weak":
+        lagna_warnings.append("Groom's Venus (marriage karaka) is weak — remedial attention advised.")
+    if jupiter_karaka.get("assessment") == "Weak":
+        lagna_warnings.append("Bride's Jupiter (husband karaka) is weak — remedial attention advised.")
+    for lbl, ul in [("Bride", bride_ul), ("Groom", groom_ul)]:
+        for w in ul.get("warnings", []):
+            lagna_warnings.append(f"[{lbl} UL] {w}")
+    for lbl, sb in [("Bride", bride_shadbala), ("Groom", groom_shadbala)]:
+        if sb.get("overall") == "Weak":
+            lagna_warnings.append(f"{lbl}'s marriage planets are weakly placed (Shadbala).")
+
+    return {
+        "seventh_house": {"bride": bride_7th, "groom": groom_7th},
+        "karaka": {"venus_groom": venus_karaka, "jupiter_bride": jupiter_karaka},
+        "upapada_lagna": {
+            "bride": bride_ul,
+            "groom": groom_ul,
+            "cross_chart_notes": cross_ul_notes,
+        },
+        "shadbala": {"bride": bride_shadbala, "groom": groom_shadbala},
+        "lagna_warnings": lagna_warnings,
+    }

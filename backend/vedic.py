@@ -121,6 +121,30 @@ MOOLATRIKONA = {'Sun': (5, 0, 20), 'Moon': (2, 3, 30), 'Mars': (1, 0, 12),
                 'Mercury': (6, 15, 20), 'Jupiter': (9, 0, 10), 'Venus': (7, 0, 15),
                 'Saturn': (11, 0, 20)}
 
+# Absolute sidereal degrees of deep exaltation / deep debilitation points
+# Used for Uccha Bala (Shadbala component).
+# Deep exaltation = (sign-1)*30 + degree_in_sign
+DEEP_EXALTATION_DEG: dict[str, float] = {
+    'Sun':     10.0,   # Aries 10°
+    'Moon':    33.0,   # Taurus 3°
+    'Mars':    298.0,  # Capricorn 28°
+    'Mercury': 165.0,  # Virgo 15°
+    'Jupiter': 95.0,   # Cancer 5°
+    'Venus':   357.0,  # Pisces 27°
+    'Saturn':  200.0,  # Libra 20°
+}
+# Deep debilitation = exaltation + 180° (mod 360)
+DEEP_DEBILITATION_DEG: dict[str, float] = {
+    'Sun':     190.0,  # Libra 10°
+    'Moon':    213.0,  # Scorpio 3°
+    'Mars':    118.0,  # Cancer 28°
+    'Mercury': 345.0,  # Pisces 15°
+    'Jupiter': 275.0,  # Capricorn 5°
+    'Venus':   177.0,  # Virgo 27°
+    'Saturn':  20.0,   # Aries 20°
+}
+
+
 
 # ═══════════════════════════════════════════════════════════════════════════ #
 # FUNCTIONS
