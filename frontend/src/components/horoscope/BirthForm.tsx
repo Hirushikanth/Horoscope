@@ -3,6 +3,8 @@ import { useMutation } from '@tanstack/react-query';
 import { GlassCard } from '../ui/GlassCard';
 import { Input } from '../ui/Input';
 import { GlowButton } from '../ui/GlowButton';
+import { DateInput } from '../ui/Calendar';
+import { Clock } from '../ui/Clock';
 import { fetchHoroscope } from '../../utils/api';
 import type { BirthData } from '../../types';
 import { useAppStore } from '../../store/appStore';
@@ -55,8 +57,15 @@ export const BirthForm = () => {
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="flex gap-4">
-          <Input id="date" type="date" label="Date of Birth" required value={formData.date} onChange={handleChange} />
-          <Input id="time" type="time" step="1" label="Time of Birth" required value={formData.time} onChange={handleChange} />
+          <DateInput
+            value={formData.date}
+            onChange={(date) => setFormData(prev => ({ ...prev, date }))}
+            label="Date of Birth"
+          />
+          <Clock
+            value={formData.time}
+            onChange={(time) => setFormData(prev => ({ ...prev, time }))}
+          />
         </div>
         
         <div className="flex gap-4">
