@@ -1430,6 +1430,123 @@ def _check_dasha_compatibility(
 
 
 # ═══════════════════════════════════════════════════════════════════════════ #
+# SOUTH INDIAN 10 PORUTHAM (DASHAKOOTA) ANALYSIS
+# ═══════════════════════════════════════════════════════════════════════════ #
+
+def _get_rajju_category(nak_idx: int) -> str:
+    """
+    Map a Nakshatra index (0-26) to its Rajju (body part) category.
+    The sequence mathematically mirrors every 9 stars.
+    """
+    rem = nak_idx % 9
+    mapping = {
+        0: "Pada", 1: "Kati", 2: "Nabhi", 3: "Kantha", 4: "Shiro",
+        5: "Kantha", 6: "Nabhi", 7: "Kati", 8: "Pada"
+    }
+    return mapping[rem]
+
+def _calculate_rajju_porutham(b_nak_idx: int, g_nak_idx: int) -> dict:
+    """
+    Rajju Porutham: Husband and wife must NOT belong to the same Rajju.
+    If they do, it causes severe Rajju Dosha (danger to longevity).
+    """
+    b_rajju = _get_rajju_category(b_nak_idx)
+    g_rajju = _get_rajju_category(g_nak_idx)
+
+    if b_rajju == g_rajju:
+        return {
+            "match": False,
+            "category": b_rajju,
+            "description": f"Both belong to {b_rajju} Rajju. Severe Rajju Dosha present — highly inauspicious."
+        }
+    return {
+        "match": True,
+        "bride_rajju": b_rajju,
+        "groom_rajju": g_rajju,
+        "description": f"Rajju matches (Bride: {b_rajju}, Groom: {g_rajju}) — supports marital longevity."
+    }
+
+def _calculate_mahendra_porutham(b_nak_idx: int, g_nak_idx: int) -> dict:
+    """
+    Mahendra Porutham: Groom's star counted from Bride's star should be
+    4, 7, 10, 13, 16, 19, 22, 25. Indicates progeny and wealth.
+    """
+    dist = (g_nak_idx - b_nak_idx) % 27 + 1
+    # 4, 7, 10, 13... map to dist % 3 == 1 (and dist != 1)
+    if dist % 3 == 1 and dist != 1:
+        return {"match": True, "description": "Mahendra Porutham is present. Auspicious for progeny and wealth."}
+    return {"match": False, "description": "Mahendra Porutham is absent."}
+
+def _calculate_sthree_deergha_porutham(b_nak_idx: int, g_nak_idx: int) -> dict:
+    """
+    Sthree Deergha Porutham: Groom's star counted from Bride's star.
+    >13 is Uthamam, 7-13 is Madhyamam, <7 is Athamam. Indicates wife's longevity and well-being.
+    """
+    dist = (g_nak_idx - b_nak_idx) % 27 + 1
+    if dist > 13:
+        return {"match": True, "score": "Uthamam", "description": "Uthamam (Excellent) — strong indicator of wife's well-being and prosperity."}
+    elif dist >= 7:
+        return {"match": True, "score": "Madhyamam", "description": "Madhyamam (Average) — acceptable for marriage."}
+    else:
+        return {"match": False, "score": "Athamam", "description": "Athamam (Bad) — less favorable for wife's longevity."}
+
+def _compute_south_indian_poruthams(
+    b_nak_idx: int, g_nak_idx: int,
+    kootas: dict, vedha_present: bool
+) -> dict:
+    """
+    Aggregates the classical South Indian 10 Poruthams (Dashakoota) results.
+    """
+    rajju = _calculate_rajju_porutham(b_nak_idx, g_nak_idx)
+    mahendra = _calculate_mahendra_porutham(b_nak_idx, g_nak_idx)
+    sthree_deergha = _calculate_sthree_deergha_porutham(b_nak_idx, g_nak_idx)
+
+    poruthams = {
+        "Dina": {
+            "match": kootas["tara"]["obtained"] >= 1.5,
+            "description": "Tara/Dina compatibility for health and prosperity.",
+        },
+        "Gana": {
+            "match": kootas["gana"]["obtained"] >= 3.0,
+            "description": "Temperament compatibility (Gana).",
+        },
+        "Yoni": {
+            "match": kootas["yoni"]["obtained"] >= 2.0,
+            "description": "Physical compatibility and mutual attraction (Yoni).",
+        },
+        "Rasi": {
+            "match": kootas["bhakoot"]["obtained"] > 0,
+            "description": "Moon sign compatibility for family growth (Bhakoot).",
+        },
+        "Rasiyathipathy": {
+            "match": kootas["graha_maitri"]["obtained"] > 2.0,
+            "description": "Planetary lord friendship (Graha Maitri).",
+        },
+        "Vasya": {
+            "match": kootas["vashya"]["obtained"] >= 1.0,
+            "description": "Mutual attraction and devotion (Vashya).",
+        },
+        "Vedha": {
+            "match": not vedha_present,
+            "description": "Absence of mutually afflicting Nakshatras (Vedha).",
+        },
+        "Rajju": rajju,
+        "Mahendra": mahendra,
+        "Sthree Deergha": sthree_deergha,
+    }
+
+    matches = sum(1 for p in poruthams.values() if p["match"])
+
+    return {
+        "total_matches": matches,
+        "out_of": 10,
+        "poruthams": poruthams,
+        "rajju_dosha": not rajju["match"],
+        "assessment": f"{matches}/10 Poruthams match. " + ("Severe Rajju Dosha present!" if not rajju["match"] else "Rajju is compatible."),
+    }
+
+
+# ═══════════════════════════════════════════════════════════════════════════ #
 # MASTER FUNCTION — Complete Kundali Matching
 # ═══════════════════════════════════════════════════════════════════════════ #
 
@@ -1590,6 +1707,18 @@ def compute_kundali_matching(
     if lagna_compat.get("lagna_warnings"):
         warnings.extend(lagna_compat["lagna_warnings"])
 
+    # ── South Indian 10 Porutham (Dashakoota) Analysis ──
+    south_indian = _compute_south_indian_poruthams(
+        bride_nak["index"], groom_nak["index"],
+        {
+            "tara": tara, "gena": gana, "yoni": yoni, "gana": gana,
+            "bhakoot": bhakoot, "graha_maitri": graha_maitri, "vashya": vashya
+        },
+        vedha.get("has_vedha", False)
+    )
+    if south_indian.get("rajju_dosha"):
+        warnings.append("Severe Rajju Dosha present — highly inauspicious for marital longevity.")
+
     if not warnings:
         conclusion = f"Match score: {total_points}/{max_points} ({level}). {level_desc} No major doshas detected."
     else:
@@ -1631,6 +1760,7 @@ def compute_kundali_matching(
         },
         "navamsa_compatibility": navamsa_compat,
         "lagna_analysis": lagna_compat,
+        "south_indian_poruthams": south_indian,
         "warnings": warnings,
         "conclusion": conclusion,
     }

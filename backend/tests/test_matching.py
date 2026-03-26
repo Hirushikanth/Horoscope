@@ -1161,6 +1161,65 @@ class TestMarriageShadbala:
         assert v_res["uccha_bala"] == 60.0
         assert v_res["dig_bala"] == 60.0
         assert v_res["kendradi_bala"] == 60.0
+        assert v_res["kendradi_bala"] == 60.0
         assert v_res["total_virupas"] == 180.0
         assert v_res["strength"] == "Strong"
 
+
+# ═══════════════════════════════════════════════════════════════════════════ #
+# TEST: SOUTH INDIAN 10 PORUTHAM (DASHAKOOTA)
+# ═══════════════════════════════════════════════════════════════════════════ #
+
+class TestSouthIndianPoruthams:
+    """Tests for Rajju, Mahendra, and Sthree Deergha Poruthams."""
+
+    def test_rajju_porutham(self):
+        """Verify mathematical mapping of Nakshatras to Rajju body parts."""
+        from matching import _calculate_rajju_porutham
+        # Ashwini (0) -> Pada
+        # Magha (9) -> Pada
+        # Bharani (1) -> Kati
+        
+        # Ashwini vs Magha (Both Pada) -> Dosha
+        dosha_res = _calculate_rajju_porutham(0, 9)
+        assert dosha_res["match"] is False
+        assert "Pada" in dosha_res["description"]
+        assert "Dosha" in dosha_res["description"]
+
+        # Ashwini vs Bharani -> No Dosha
+        match_res = _calculate_rajju_porutham(0, 1)
+        assert match_res["match"] is True
+        assert match_res["bride_rajju"] == "Pada"
+        assert match_res["groom_rajju"] == "Kati"
+
+    def test_mahendra_porutham(self):
+        """Mahendra passes for counts 4, 7, 10, 13, 16, 19, 22, 25."""
+        from matching import _calculate_mahendra_porutham
+        # If bride is 0 (Ashwini)
+        # 4th star = index 3 (Rohini) -> Should pass
+        assert _calculate_mahendra_porutham(0, 3)["match"] is True
+        
+        # 10th star = index 9 (Magha) -> Should pass
+        assert _calculate_mahendra_porutham(0, 9)["match"] is True
+
+        # 5th star = index 4 (Mrigashira) -> Should fail
+        assert _calculate_mahendra_porutham(0, 4)["match"] is False
+
+    def test_sthree_deergha_porutham(self):
+        """Sthree Deergha thresholds: >13 Uthamam, 7-13 Madhyamam, <7 Athamam."""
+        from matching import _calculate_sthree_deergha_porutham
+        # Bride = 0
+        # Groom = 15 (16th star, dist = 16) -> >13 (Uthamam)
+        res_uthamam = _calculate_sthree_deergha_porutham(0, 15)
+        assert res_uthamam["match"] is True
+        assert res_uthamam["score"] == "Uthamam"
+
+        # Groom = 10 (11th star, dist = 11) -> 7-13 (Madhyamam)
+        res_madhyamam = _calculate_sthree_deergha_porutham(0, 10)
+        assert res_madhyamam["match"] is True
+        assert res_madhyamam["score"] == "Madhyamam"
+
+        # Groom = 2 (3rd star, dist = 3) -> <7 (Athamam)
+        res_athamam = _calculate_sthree_deergha_porutham(0, 2)
+        assert res_athamam["match"] is False
+        assert res_athamam["score"] == "Athamam"
