@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { GlassCard } from '../ui/GlassCard';
 import { Input } from '../ui/Input';
-import { Select } from '../ui/Select';
+import { SystemToggle } from '../ui/SystemToggle';
 import { GlowButton } from '../ui/GlowButton';
 import { fetchMatching } from '../../utils/api';
 import { type MatchingInput } from '../../types';
@@ -75,22 +75,18 @@ export const MatchingForm = () => {
       
       <form onSubmit={handleSubmit} className="flex flex-col gap-6">
         
-        {/* System Selector Card (Top Center) */}
-        <div className="flex justify-center">
-          <GlassCard className="w-full max-w-md p-6 text-center">
-            <h2 className="font-cinematic text-2xl font-bold text-white mb-4">Matching Tradition</h2>
-            <Select 
-              id="system"
-              label="Select Astrological System"
-              value={formData.system}
-              onChange={(e) => setFormData(prev => ({ ...prev, system: e.target.value as any }))}
-              options={[
-                { value: 'both', label: 'Comprehensive (North & South Combined)' },
-                { value: 'north_indian', label: 'Ashta Koota Milan (North Indian 36 Points)' },
-                { value: 'south_indian', label: 'Dashakoota Poruthams (South Indian 10 Points)' },
-              ]}
-            />
-          </GlassCard>
+        {/* Sleek Floating System Toggle */}
+        <div className="flex flex-col items-center justify-center w-full mb-2">
+          <p className="text-gray-400 text-[10px] tracking-[0.2em] uppercase mb-3">Matching Tradition</p>
+          <SystemToggle 
+            value={formData.system}
+            onChange={(val) => setFormData(prev => ({ ...prev, system: val as any }))}
+            options={[
+              { value: 'north_indian', label: 'North' },
+              { value: 'both', label: 'Combined' },
+              { value: 'south_indian', label: 'South' },
+            ]}
+          />
         </div>
 
         {/* Dual Form Cards (Side-by-Side on Desktop) */}
