@@ -20,3 +20,27 @@ export interface HoroscopeResponse {
   divisional_charts: any;
   yogas: any[];
 }
+
+export interface MatchingInput {
+  bride: BirthData;
+  groom: BirthData;
+  system: 'north_indian' | 'south_indian' | 'both';
+}
+
+export interface MatchingResponse {
+  bride: { nakshatra: any; rashi: any; moon_longitude: number };
+  groom: { nakshatra: any; rashi: any; moon_longitude: number };
+  kootas?: Record<string, any>;
+  total_points: number;
+  max_points: number;
+  compatibility_level: string;
+  compatibility_description: string;
+  vedha: { has_vedha: boolean; description: string };
+  manglik_dosha: { bride: any; groom: any; both_manglik_cancellation: boolean };
+  navamsa_compatibility: any;
+  lagna_analysis: any;
+  south_indian_poruthams?: any;
+  dasha_compatibility?: any;
+  warnings: string[];
+  conclusion: string;
+}
