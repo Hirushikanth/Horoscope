@@ -981,160 +981,151 @@ def check_manglik_dosha(
         return {
             "is_manglik": False,
             "description": "Mars data not available.",
+            "lagna_check": {}, "moon_check": {}, "venus_check": {}
         }
 
     mars_sid: float = mars_data.get("sidereal_longitude", 0.0)
     asc_sign_idx: int = int(np.float64(ascendant_sidereal) % np.float64(360.0) / np.float64(30.0))
     mars_sign_idx: int = int(np.float64(mars_sid) % np.float64(360.0) / np.float64(30.0))
+    mars_dignity = get_planetary_dignity("Mars", float(mars_sid))
 
-    # Calculate Mars house from Lagna (whole sign system)
-    mars_house: int = (mars_sign_idx - asc_sign_idx) % 12 + 1
+    moon_data = planets.get("Moon")
+    moon_sign_idx = int(np.float64(moon_data.get("sidereal_longitude", 0.0)) % np.float64(360.0) / np.float64(30.0)) if moon_data else -1
+    
+    venus_data = planets.get("Venus")
+    venus_sign_idx = int(np.float64(venus_data.get("sidereal_longitude", 0.0)) % np.float64(360.0) / np.float64(30.0)) if venus_data else -1
 
-    is_manglik: bool = mars_house in MANGLIK_HOUSES
-
-    if not is_manglik:
-        return {
-            "is_manglik": False,
-            "mars_house": mars_house,
-            "mars_sign": RASHIS[mars_sign_idx]["name"],
-            "description": f"Mars in house {mars_house} — no Manglik Dosha.",
-        }
-
-    # ── Helper functions ──
     def _sign_of(planet_name: str) -> int:
-        """Get sign index (0-11) of a planet, or -1 if absent."""
         p = planets.get(planet_name)
-        if p is None:
-            return -1
+        if p is None: return -1
         return int(np.float64(p.get("sidereal_longitude", 0.0)) % np.float64(360.0) / np.float64(30.0))
 
-    def _house_of(planet_name: str) -> int:
-        """Get house (1-12) of a planet from Lagna, or -1 if absent."""
+    def _house_of_from(planet_name: str, ref_idx: int) -> int:
         s = _sign_of(planet_name)
-        if s < 0:
-            return -1
-        return (s - asc_sign_idx) % 12 + 1
+        if s < 0 or ref_idx < 0: return -1
+        return (s - ref_idx) % 12 + 1
 
-    # ── Collect all applicable cancellations ──
-    cancellations: list[str] = []
-    mars_dignity = get_planetary_dignity("Mars", mars_sid)
+    def _check_from_ref(ref_name: str, ref_sign_idx: int) -> dict:
+        if ref_sign_idx == -1:
+            return {"is_manglik": False, "description": f"{ref_name} data unavailable."}
+            
+        mars_house: int = (mars_sign_idx - ref_sign_idx) % 12 + 1
+        is_manglik: bool = mars_house in MANGLIK_HOUSES
+        
+        if not is_manglik:
+            return {
+                "is_manglik": False,
+                "mars_house": mars_house,
+                "mars_sign": RASHIS[mars_sign_idx]["name"],
+                "description": f"Mars in house {mars_house} from {ref_name} — no Manglik Dosha.",
+            }
 
-    # Rule 1: Mars in own sign (Aries=0, Scorpio=7)
-    if mars_sign_idx in [0, 7]:
-        cancellations.append(
-            f"Mars in own sign ({RASHIS[mars_sign_idx]['name']}) — Manglik power subdued."
-        )
+        cancellations: list[str] = []
+        
+        if mars_sign_idx in [0, 7]:
+            cancellations.append(f"Mars in own sign ({RASHIS[mars_sign_idx]['name']}) — Manglik power subdued.")
+        if mars_sign_idx == 9:
+            cancellations.append("Mars exalted in Capricorn — Manglik Dosha cancelled.")
+        if mars_sign_idx == 3:
+            cancellations.append("Mars debilitated in Cancer — malefic power greatly reduced.")
+            
+        jup_sign = _sign_of("Jupiter")
+        if jup_sign >= 0 and jup_sign != mars_sign_idx:
+            aspect_diff = (mars_sign_idx - jup_sign) % 12 + 1
+            if aspect_diff in [5, 7, 9]:
+                cancellations.append("Jupiter aspects Mars — benefic influence cancels Manglik Dosha.")
+        
+        if jup_sign >= 0 and jup_sign == mars_sign_idx:
+            cancellations.append("Jupiter conjoins Mars in same sign — Manglik Dosha cancelled.")
+            
+        ven_sign = _sign_of("Venus")
+        if ven_sign >= 0 and ven_sign == mars_sign_idx:
+            cancellations.append("Venus conjoins Mars — benefic influence mitigates Manglik Dosha.")
+        moon_sign = _sign_of("Moon")
+        if moon_sign >= 0 and moon_sign == mars_sign_idx:
+            cancellations.append("Moon conjoins Mars — Manglik Dosha cancelled.")
+        for shadow in ["Saturn", "Rahu", "Ketu"]:
+            s_sign = _sign_of(shadow)
+            if s_sign >= 0 and s_sign == mars_sign_idx:
+                cancellations.append(f"{shadow} conjoins Mars — Manglik effect neutralized.")
+                
+        HOUSE_SIGN_CANCELLATIONS: dict[int, set[int]] = {
+            1:  {0, 4, 10}, 2:  {2, 5}, 4:  {0, 7}, 7:  {3, 9}, 8:  {8, 11}, 12: {1, 6},
+        }
+        if mars_house in HOUSE_SIGN_CANCELLATIONS:
+            if mars_sign_idx in HOUSE_SIGN_CANCELLATIONS[mars_house]:
+                cancellations.append(f"Mars in house {mars_house} from {ref_name} in {RASHIS[mars_sign_idx]['name']} — sign-specific cancellation applies.")
+        
+        if asc_sign_idx in [3, 4]:
+            cancellations.append(f"Mars is Yogakaraka for {RASHIS[asc_sign_idx]['name']} Lagna — Manglik Dosha does not apply.")
+            
+        for benefic in ["Jupiter", "Venus"]:
+            b_house = _house_of_from(benefic, asc_sign_idx)
+            if b_house == 1:
+                cancellations.append(f"{benefic} in Lagna — benefic protection cancels Manglik Dosha.")
 
-    # Rule 2: Mars exalted (Capricorn=9)
-    if mars_sign_idx == 9:
-        cancellations.append("Mars exalted in Capricorn — Manglik Dosha cancelled.")
-
-    # Rule 3: Mars debilitated (Cancer=3)
-    if mars_sign_idx == 3:
-        cancellations.append("Mars debilitated in Cancer — malefic power greatly reduced.")
-
-    # Rule 4: Jupiter aspects Mars (5th, 7th, 9th from Jupiter)
-    jup_sign = _sign_of("Jupiter")
-    if jup_sign >= 0 and jup_sign != mars_sign_idx:
-        aspect_diff = (mars_sign_idx - jup_sign) % 12 + 1
-        if aspect_diff in [5, 7, 9]:
-            cancellations.append(
-                "Jupiter aspects Mars — benefic influence cancels Manglik Dosha."
-            )
-
-    # Rule 5: Jupiter conjoins Mars (same sign)
-    if jup_sign >= 0 and jup_sign == mars_sign_idx:
-        cancellations.append(
-            "Jupiter conjoins Mars in same sign — Manglik Dosha cancelled."
-        )
-
-    # Rule 6: Venus conjoins Mars
-    ven_sign = _sign_of("Venus")
-    if ven_sign >= 0 and ven_sign == mars_sign_idx:
-        cancellations.append(
-            "Venus conjoins Mars — benefic influence mitigates Manglik Dosha."
-        )
-
-    # Rule 7: Moon conjoins Mars
-    moon_sign = _sign_of("Moon")
-    if moon_sign >= 0 and moon_sign == mars_sign_idx:
-        cancellations.append("Moon conjoins Mars — Manglik Dosha cancelled.")
-
-    # Rule 8: Saturn/Rahu/Ketu conjoins Mars
-    for shadow in ["Saturn", "Rahu", "Ketu"]:
-        s_sign = _sign_of(shadow)
-        if s_sign >= 0 and s_sign == mars_sign_idx:
-            cancellations.append(f"{shadow} conjoins Mars — Manglik effect neutralized.")
-
-    # Rules 9–14: Sign-specific house cancellations (BPHS)
-    HOUSE_SIGN_CANCELLATIONS: dict[int, set[int]] = {
-        1:  {0, 4, 10},    # Aries, Leo, Aquarius
-        2:  {2, 5},         # Gemini, Virgo
-        4:  {0, 7},         # Aries, Scorpio
-        7:  {3, 9},         # Cancer, Capricorn
-        8:  {8, 11},        # Sagittarius, Pisces
-        12: {1, 6},         # Taurus, Libra
-    }
-    if mars_house in HOUSE_SIGN_CANCELLATIONS:
-        if mars_sign_idx in HOUSE_SIGN_CANCELLATIONS[mars_house]:
-            cancellations.append(
-                f"Mars in house {mars_house} in {RASHIS[mars_sign_idx]['name']} "
-                f"— sign-specific cancellation applies (BPHS)."
-            )
-
-    # Rule 15: Yogakaraka Mars (Cancer=3 or Leo=4 ascendant)
-    if asc_sign_idx in [3, 4]:
-        cancellations.append(
-            f"Mars is Yogakaraka for {RASHIS[asc_sign_idx]['name']} Lagna "
-            f"— Manglik Dosha does not apply."
-        )
-
-    # Rule 16: Benefic (Jupiter/Venus) in Lagna
-    for benefic in ["Jupiter", "Venus"]:
-        b_house = _house_of(benefic)
-        if b_house == 1:
-            cancellations.append(
-                f"{benefic} in Lagna — benefic protection cancels Manglik Dosha."
-            )
-
-    # ── Determine cancellation status and strength ──
-    is_cancelled: bool = len(cancellations) > 0
-    num_c = len(cancellations)
-
-    if not is_cancelled:
-        if mars_house in [7, 8]:
-            strength = "Severe"
-        elif mars_house in [1, 4, 12]:
-            strength = "Moderate"
+        is_cancelled: bool = len(cancellations) > 0
+        num_c = len(cancellations)
+        if not is_cancelled:
+            strength = "Severe" if mars_house in [7, 8] else ("Moderate" if mars_house in [1, 4, 12] else "Mild")
         else:
-            strength = "Mild"
-    else:
-        if num_c >= 3:
-            strength = "Negligible"
-        elif num_c == 2:
-            strength = "Mild"
-        else:
-            strength = "Moderate"
+            strength = "Negligible" if num_c >= 3 else ("Mild" if num_c == 2 else "Moderate")
 
-    if is_cancelled:
-        desc = (f"Mars in house {mars_house} ({RASHIS[mars_sign_idx]['name']}) — "
-                f"Manglik Dosha present but mitigated ({strength}). "
-                + " ".join(cancellations))
+        if is_cancelled:
+            desc = f"Mars in house {mars_house} from {ref_name} ({RASHIS[mars_sign_idx]['name']}) — Dosha present but mitigated ({strength}). " + " ".join(cancellations)
+        else:
+            desc = f"Mars in house {mars_house} from {ref_name} ({RASHIS[mars_sign_idx]['name']}) — Dosha present ({strength}). May indicate challenges."
+
+        return {
+            "is_manglik": True, "is_cancelled": is_cancelled, "mars_house": mars_house,
+            "mars_sign": RASHIS[mars_sign_idx]["name"], "strength": strength,
+            "cancellations": cancellations, "cancellation_count": num_c, "description": desc
+        }
+        
+    lagna_result = _check_from_ref("Lagna", asc_sign_idx)
+    moon_result = _check_from_ref("Moon", moon_sign_idx)
+    venus_result = _check_from_ref("Venus", venus_sign_idx)
+    
+    total_manglik = lagna_result.get("is_manglik", False) or moon_result.get("is_manglik", False) or venus_result.get("is_manglik", False)
+    
+    unmitigated = any([
+        r.get("is_manglik", False) and not r.get("is_cancelled", False)
+        for r in [lagna_result, moon_result, venus_result]
+    ])
+    
+    strengths = [r.get("strength", "None") for r in [lagna_result, moon_result, venus_result] if r.get("is_manglik", False)]
+    if "Severe" in strengths: overall_strength = "Severe"
+    elif "Moderate" in strengths: overall_strength = "Moderate"
+    elif "Mild" in strengths: overall_strength = "Mild"
+    elif "Negligible" in strengths: overall_strength = "Negligible"
+    else: overall_strength = "None"
+    
+    if unmitigated:
+        overall_desc = f"Triple Chevvai Dosham: Unmitigated dosha present. Overall Strength: {overall_strength}."
+    elif total_manglik:
+        overall_desc = f"Triple Chevvai Dosham: Dosha is present but mitigated. Overall Strength: {overall_strength}."
     else:
-        desc = (f"Mars in house {mars_house} ({RASHIS[mars_sign_idx]['name']}) — "
-                f"Manglik Dosha present ({strength}). "
-                f"May indicate challenges in marital harmony.")
+        overall_desc = "Triple Chevvai Dosham: No Manglik Dosha found from Lagna, Moon, or Venus."
+
+    all_cancellations = lagna_result.get("cancellations", []) + moon_result.get("cancellations", []) + venus_result.get("cancellations", [])
+    # Deduplicate cancellations for the top-level list
+    unique_cancellations = []
+    for c in all_cancellations:
+        if c not in unique_cancellations: unique_cancellations.append(c)
 
     return {
-        "is_manglik": True,
-        "is_cancelled": is_cancelled,
-        "mars_house": mars_house,
+        "is_manglik": total_manglik,
+        "is_cancelled": not unmitigated if total_manglik else False,
+        "mars_house": lagna_result.get("mars_house", None),
         "mars_sign": RASHIS[mars_sign_idx]["name"],
         "mars_dignity": mars_dignity.get("status", ""),
-        "strength": strength,
-        "cancellations": cancellations,
-        "cancellation_count": num_c,
-        "description": desc,
+        "strength": overall_strength,
+        "cancellations": unique_cancellations,
+        "cancellation_count": len(unique_cancellations),
+        "description": overall_desc,
+        "lagna_check": lagna_result,
+        "moon_check": moon_result,
+        "venus_check": venus_result
     }
 
 # ═══════════════════════════════════════════════════════════════════════════ #
@@ -1405,6 +1396,14 @@ def _check_dasha_compatibility(
     if groom_dasha["dasha_sandhi"]:
         warnings.append("Groom near Dasha Sandhi (transition) — turbulent transition period.")
 
+    # Strict Dasha Sandhi Overlap
+    if bride_dasha["mahadasha_end"] and groom_dasha["mahadasha_end"]:
+        b_end = datetime.strptime(bride_dasha["mahadasha_end"], "%Y-%m-%d")
+        g_end = datetime.strptime(groom_dasha["mahadasha_end"], "%Y-%m-%d")
+        gap_days = abs((b_end - g_end).days)
+        if gap_days < 365:
+            warnings.append(f"Strict Dasha Sandhi Overlap: Both partners transition Mahadashas within 1 year ({gap_days} days apart). Highly inauspicious.")
+
     # Overall
     if not warnings and (b_fav or g_fav):
         assessment = "Favorable"
@@ -1544,7 +1543,68 @@ def _compute_south_indian_poruthams(
         "rajju_dosha": not rajju["match"],
         "assessment": f"{matches}/10 Poruthams match. " + ("Severe Rajju Dosha present!" if not rajju["match"] else "Rajju is compatible."),
     }
+# ═══════════════════════════════════════════════════════════════════════════ #
+# PAPASAMYAM (DOSHA SAMYAM) CALCULATION
+# ═══════════════════════════════════════════════════════════════════════════ #
 
+def _calculate_papasamyam(planets: dict, asc_sid: float) -> dict:
+    """
+    Calculate Papasamyam (Dosha Samyam) points for a chart.
+    Strict Tamil rule: Sun, Mars, Saturn, Rahu, Ketu in houses 1, 2, 4, 7, 8, 12
+    from Lagna, Moon, and Venus contribute to dosha.
+    """
+    asc_idx = int(np.float64(asc_sid) % np.float64(360.0) / np.float64(30.0))
+    moon_data = planets.get("Moon")
+    moon_idx = int(np.float64(moon_data.get("sidereal_longitude", 0.0)) % np.float64(360.0) / np.float64(30.0)) if moon_data else -1
+    venus_data = planets.get("Venus")
+    venus_idx = int(np.float64(venus_data.get("sidereal_longitude", 0.0)) % np.float64(360.0) / np.float64(30.0)) if venus_data else -1
+
+    malefics = ["Sun", "Mars", "Saturn", "Rahu", "Ketu"]
+    dosha_houses = {1, 2, 4, 7, 8, 12}
+    
+    total_points = 0.0
+    details = []
+
+    def _check_ref(ref_name, ref_idx, weight=1.0):
+        if ref_idx < 0: return 0.0
+        points = 0.0
+        for m in malefics:
+            m_data = planets.get(m)
+            if not m_data: continue
+            m_idx = int(np.float64(m_data.get("sidereal_longitude", 0.0)) % np.float64(360.0) / np.float64(30.0))
+            house = (m_idx - ref_idx) % 12 + 1
+            if house in dosha_houses:
+                points += weight
+                details.append(f"{m} in house {house} from {ref_name} (+{weight})")
+        return points
+
+    total_points += _check_ref("Lagna", asc_idx, 1.0)
+    total_points += _check_ref("Moon", moon_idx, 1.0)
+    total_points += _check_ref("Venus", venus_idx, 1.0)
+
+    return {
+        "total_points": total_points,
+        "details": details,
+        "description": f"Total Papasamyam points: {total_points}",
+    }
+
+def _evaluate_papasamyam_compatibility(bride_papa: dict, groom_papa: dict) -> dict:
+    b_points = bride_papa["total_points"]
+    g_points = groom_papa["total_points"]
+    
+    # Groom's points should be >= Bride's points for compatibility
+    is_compatible = g_points >= b_points
+    if is_compatible:
+        desc = f"Papasamyam match: Groom's dosha ({g_points}) is equal to or greater than Bride's dosha ({b_points})."
+    else:
+        desc = f"Papasamyam mismatch: Bride's dosha ({b_points}) is greater than Groom's dosha ({g_points}). Highly inauspicious."
+        
+    return {
+        "is_compatible": is_compatible,
+        "bride_points": b_points,
+        "groom_points": g_points,
+        "description": desc,
+    }
 
 # ═══════════════════════════════════════════════════════════════════════════ #
 # MASTER FUNCTION — Complete Kundali Matching
@@ -1708,6 +1768,13 @@ def compute_kundali_matching(
     if lagna_compat.get("lagna_warnings"):
         warnings.extend(lagna_compat["lagna_warnings"])
 
+    # ── Papasamyam (Dosha Samyam) Analysis ──
+    papasamyam_bride = _calculate_papasamyam(bride_planets, bride_asc_sid)
+    papasamyam_groom = _calculate_papasamyam(groom_planets, groom_asc_sid)
+    papasamyam_compat = _evaluate_papasamyam_compatibility(papasamyam_bride, papasamyam_groom)
+    if not papasamyam_compat.get("is_compatible"):
+        warnings.append("Severe Papasamyam mismatch: Bride's dosha exceeds Groom's dosha. Highly inauspicious.")
+
     # ── South Indian 10 Porutham (Dashakoota) Analysis ──
     south_indian = _compute_south_indian_poruthams(
         bride_nak["index"], groom_nak["index"],
@@ -1742,6 +1809,7 @@ def compute_kundali_matching(
             "compatibility_level": level,
             "compatibility_description": level_desc,
             "vedha": vedha,
+            "papasamyam": {"bride": papasamyam_bride, "groom": papasamyam_groom, "compatibility": papasamyam_compat},
             "manglik_dosha": {"bride": bride_manglik, "groom": groom_manglik, "both_manglik_cancellation": both_manglik},
             "navamsa_compatibility": navamsa_compat,
             "lagna_analysis": lagna_compat,
@@ -1757,6 +1825,8 @@ def compute_kundali_matching(
             si_warnings.append("Severe Rajju Dosha present — highly inauspicious for marital longevity.")
         if vedha.get("has_vedha"):
             si_warnings.append("Vedha Dosha is present — Nakshatras are mutually afflicting.")
+        if not papasamyam_compat.get("is_compatible"):
+            si_warnings.append("Severe Papasamyam mismatch: Bride's dosha exceeds Groom's dosha. Highly inauspicious.")
         
         si_conclusion = south_indian["assessment"]
         if si_warnings:
@@ -1766,6 +1836,7 @@ def compute_kundali_matching(
             "bride": {"nakshatra": bride_nak, "rashi": bride_rashi, "moon_longitude": float(bride_moon_lon)},
             "groom": {"nakshatra": groom_nak, "rashi": groom_rashi, "moon_longitude": float(groom_moon_lon)},
             "south_indian_poruthams": south_indian,
+            "papasamyam": {"bride": papasamyam_bride, "groom": papasamyam_groom, "compatibility": papasamyam_compat},
             "vedha": vedha,  # Kept as it is an integral overlapping dosha
             "manglik_dosha": {"bride": bride_manglik, "groom": groom_manglik, "both_manglik_cancellation": both_manglik},
             "navamsa_compatibility": navamsa_compat,
@@ -1806,6 +1877,11 @@ def compute_kundali_matching(
             "bride": bride_manglik,
             "groom": groom_manglik,
             "both_manglik_cancellation": both_manglik,
+        },
+        "papasamyam": {
+            "bride": papasamyam_bride,
+            "groom": papasamyam_groom,
+            "compatibility": papasamyam_compat,
         },
         "navamsa_compatibility": navamsa_compat,
         "lagna_analysis": lagna_compat,
@@ -1925,6 +2001,26 @@ def _analyze_seventh_house(planets: dict, asc_sid: float, label: str) -> dict:
         assessment = "Mixed"
         adesc = f"{label}'s 7th house shows a mixed picture."
 
+    # ── Kalathra Dosham Analysis ──
+    kalathra_dosham: list[str] = []
+    
+    # 1. Venus in 7th House (Karako Bhava Nashaya)
+    if "Venus" in benefic_occs:
+        kalathra_dosham.append("Venus occupies the 7th house (Karako Bhava Nashaya) — classic Kalathra Dosham.")
+        
+    # 2. 7th Lord in Dusthana
+    if lord_house_val in [6, 8, 12]:
+        kalathra_dosham.append(f"7th lord {h7_lord} in house {lord_house_val} (Dusthana) — Kalathra Dosham.")
+        
+    # 3. 7th Lord Combust
+    if lord_info["lord"] != "Sun" and "Sun" in planets and h7_lord in planets:
+        h7_lon = np.float64(planets[h7_lord].get("sidereal_longitude", 0.0))
+        sun_lon = np.float64(planets["Sun"].get("sidereal_longitude", 0.0))
+        diff = float(abs(h7_lon - sun_lon) % np.float64(360.0))
+        if diff > 180.0: diff = 360.0 - diff
+        if diff <= 8.0:
+            kalathra_dosham.append(f"7th lord {h7_lord} is combust (highly afflicted) — Kalathra Dosham.")
+
     return {
         "seventh_house_sign": RASHIS[h7_sign_idx]["name"],
         "seventh_lord": lord_info,
@@ -1932,6 +2028,7 @@ def _analyze_seventh_house(planets: dict, asc_sid: float, label: str) -> dict:
         "malefic_occupants": malefic_occs,
         "benefic_aspects": benefic_aspects,
         "afflictions": afflictions,
+        "kalathra_dosham": kalathra_dosham,
         "assessment": assessment,
         "assessment_description": adesc,
     }
@@ -2387,6 +2484,9 @@ def _synthesize_lagna_analysis(
     for lbl, h7 in [("Bride", bride_7th), ("Groom", groom_7th)]:
         if h7["assessment"] == "Afflicted":
             lagna_warnings.append(f"{lbl}'s 7th house is afflicted — Lagna chart caution.")
+        if h7.get("kalathra_dosham"):
+            for kd in h7["kalathra_dosham"]:
+                lagna_warnings.append(f"[{lbl} Kalathra Dosham] {kd}")
     if venus_karaka.get("assessment") == "Weak":
         lagna_warnings.append("Groom's Venus (marriage karaka) is weak — remedial attention advised.")
     if jupiter_karaka.get("assessment") == "Weak":

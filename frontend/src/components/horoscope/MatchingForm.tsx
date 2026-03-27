@@ -13,23 +13,22 @@ import { HeartHandshake } from 'lucide-react';
 export const MatchingForm = () => {
   const setMatchingData = useAppStore((state) => state.setMatchingData);
 
-  // Pre-filled with two coordinates for instant testing (Delhi vs Mumbai)
   const [formData, setFormData] = useState<MatchingInput>({
     bride: {
       date: '1995-05-15',
       time: '10:30:00',
-      latitude: 28.6139,
-      longitude: 77.2090,
-      timezone: 'Asia/Kolkata',
+      latitude: 6.9271,
+      longitude: 79.8612,
+      timezone: 'Asia/Colombo',
     },
     groom: {
       date: '1992-08-20',
       time: '14:45:00',
-      latitude: 19.0760,
-      longitude: 72.8777,
-      timezone: 'Asia/Kolkata',
+      latitude: 6.9271,
+      longitude: 79.8612,
+      timezone: 'Asia/Colombo',
     },
-    system: 'both',
+    system: 'south_indian',
   });
 
   const mutation = useMutation({

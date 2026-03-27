@@ -6,7 +6,7 @@ export const DoshaAlerts = () => {
   const { matchingData } = useAppStore();
   if (!matchingData) return null;
 
-  const { vedha, manglik_dosha, kootas, warnings } = matchingData;
+  const { vedha, manglik_dosha, kootas } = matchingData;
   const alerts: { title: string; desc: string }[] = [];
 
   // Vedha Dosha (Mutual Repulsion)
@@ -14,6 +14,14 @@ export const DoshaAlerts = () => {
     alerts.push({
       title: 'Vedha Dosha Detected',
       desc: vedha.description,
+    });
+  }
+
+  // Papasamyam (Dosha Samyam Balance)
+  if (matchingData.papasamyam && !matchingData.papasamyam.compatibility.is_compatible) {
+    alerts.push({
+      title: 'Papasamyam Mismatch',
+      desc: matchingData.papasamyam.compatibility.description,
     });
   }
 

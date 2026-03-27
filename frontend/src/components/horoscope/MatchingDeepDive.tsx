@@ -24,6 +24,50 @@ export const MatchingDeepDive = () => {
 
       <div className="flex flex-col space-y-4">
         
+        {/* 0. PAPASAMYAM (DOSHA BALANCE) */}
+        {matchingData.papasamyam && (
+          <GlassAccordion
+            title="Papasamyam (Dosha Samyam)"
+            subtitle="Malefic point balance from Lagna, Moon, and Venus"
+            badges={
+              <span className={`text-[10px] uppercase tracking-widest px-2 py-1 rounded border ${
+                matchingData.papasamyam.compatibility.is_compatible ? 'border-green-400/30 bg-green-400/10 text-green-400' : 'border-red-400/30 bg-red-400/10 text-red-400'
+              }`}>
+                {matchingData.papasamyam.compatibility.is_compatible ? 'Balanced' : 'Imbalanced'}
+              </span>
+            }
+          >
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Bride Points */}
+                <div className="bg-pink-500/5 p-4 rounded-lg border border-pink-500/10">
+                  <div className="flex justify-between items-center mb-3">
+                    <p className="text-pink-300 text-xs uppercase tracking-widest font-bold">Bride Dosha</p>
+                    <span className="text-2xl font-cinematic text-white">{matchingData.papasamyam.bride.total_points} pts</span>
+                  </div>
+                  <ul className="text-[10px] space-y-1 text-gray-400 italic">
+                    {matchingData.papasamyam.bride.details.map((d: string, i: number) => <li key={i}>• {d}</li>)}
+                  </ul>
+                </div>
+
+                {/* Groom Points */}
+                <div className="bg-blue-500/5 p-4 rounded-lg border border-blue-500/10">
+                  <div className="flex justify-between items-center mb-3">
+                    <p className="text-blue-300 text-xs uppercase tracking-widest font-bold">Groom Dosha</p>
+                    <span className="text-2xl font-cinematic text-white">{matchingData.papasamyam.groom.total_points} pts</span>
+                  </div>
+                  <ul className="text-[10px] space-y-1 text-gray-400 italic">
+                    {matchingData.papasamyam.groom.details.map((d: string, i: number) => <li key={i}>• {d}</li>)}
+                  </ul>
+                </div>
+              </div>
+              <p className="text-sm text-gold-light bg-gold-primary/5 p-3 rounded border border-gold-primary/10 italic">
+                {matchingData.papasamyam.compatibility.description}
+              </p>
+            </div>
+          </GlassAccordion>
+        )}
+
         {/* 1. NAVAMSA (D9) ACCORDION */}
         {d9 && (
           <GlassAccordion
@@ -106,6 +150,25 @@ export const MatchingDeepDive = () => {
                 </div>
               </div>
 
+              {/* Kalathra Dosham Specific Section */}
+              {(lagna.seventh_house.bride.kalathra_dosham.length > 0 || lagna.seventh_house.groom.kalathra_dosham.length > 0) && (
+                <div className="bg-red-500/5 p-4 rounded-lg border border-red-500/20 mt-4">
+                  <p className="text-red-400 text-xs uppercase tracking-widest mb-3">Kalathra Dosham Indicators</p>
+                  <div className="space-y-3">
+                    {lagna.seventh_house.bride.kalathra_dosham.map((kd: string, i: number) => (
+                      <p key={i} className="text-xs text-gray-300 flex items-start gap-2">
+                        <span className="text-pink-400 font-bold">Bride:</span> {kd}
+                      </p>
+                    ))}
+                    {lagna.seventh_house.groom.kalathra_dosham.map((kd: string, i: number) => (
+                      <p key={i} className="text-xs text-gray-300 flex items-start gap-2">
+                        <span className="text-blue-400 font-bold">Groom:</span> {kd}
+                      </p>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Warnings List */}
               {lagna.lagna_warnings.length > 0 && (
                 <div className="bg-orange-500/10 p-4 rounded-lg border border-orange-500/20 mt-4">
@@ -163,7 +226,9 @@ export const MatchingDeepDive = () => {
                     <p key={i} className="text-sm text-green-400 flex items-start gap-2"><CheckCircle2 size={16} className="mt-0.5 flex-shrink-0"/> {f}</p>
                   ))}
                   {dasha.warnings.map((w: string, i: number) => (
-                    <p key={i} className="text-sm text-orange-400 flex items-start gap-2"><AlertTriangle size={16} className="mt-0.5 flex-shrink-0"/> {w}</p>
+                    <p key={i} className={`text-sm flex items-start gap-2 ${w.includes('Strict Dasha Sandhi') ? 'text-red-400 font-bold' : 'text-orange-400'}`}>
+                      <AlertTriangle size={16} className="mt-0.5 flex-shrink-0"/> {w}
+                    </p>
                   ))}
                 </div>
               )}

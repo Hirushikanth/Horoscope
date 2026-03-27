@@ -36,7 +36,34 @@ export interface MatchingResponse {
   compatibility_level: string;
   compatibility_description: string;
   vedha: { has_vedha: boolean; description: string };
-  manglik_dosha: { bride: any; groom: any; both_manglik_cancellation: boolean };
+  papasamyam: {
+    bride: { total_points: number; details: string[]; description: string };
+    groom: { total_points: number; details: string[]; description: string };
+    compatibility: { is_compatible: boolean; bride_points: number; groom_points: number; description: string };
+  };
+  manglik_dosha: {
+    bride: {
+      is_manglik: boolean;
+      is_cancelled: boolean;
+      strength: string;
+      description: string;
+      cancellations: string[];
+      lagna_check: any;
+      moon_check: any;
+      venus_check: any;
+    };
+    groom: {
+      is_manglik: boolean;
+      is_cancelled: boolean;
+      strength: string;
+      description: string;
+      cancellations: string[];
+      lagna_check: any;
+      moon_check: any;
+      venus_check: any;
+    };
+    both_manglik_cancellation: boolean;
+  };
   navamsa_compatibility: any;
   lagna_analysis: any;
   south_indian_poruthams?: any;

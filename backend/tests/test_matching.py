@@ -472,17 +472,14 @@ class TestManglikDosha:
     """Tests for Manglik Dosha detection and cancellation."""
 
     def test_no_manglik(self):
-        """Mars not in a Manglik house → no dosha."""
+        """Mars not in a Manglik house from Lagna, Moon, or Venus → no dosha."""
         planets = {
-            "Mars": {"sidereal_longitude": 150.0},  # Virgo (idx 5)
+            "Mars": {"sidereal_longitude": 70.0},  # Gemini (idx 2)
             "Jupiter": {"sidereal_longitude": 200.0},
-            "Venus": {"sidereal_longitude": 100.0},
+            "Venus": {"sidereal_longitude": 10.0},   # Aries (idx 0)
         }
-        # Ascendant in Leo (idx 4, ~120°), Mars in Virgo = house 2... 
-        # Actually (5-4)%12+1=2, which IS a Manglik house.
-        # Let's put Mars in a non-Manglik house: house 3, 5, 6, 9, 10, 11
-        # Asc in Aries (0°), Mars in Gemini (60°-90°) → idx 2 → house 3
-        planets["Mars"]["sidereal_longitude"] = 70.0  # Gemini
+        # Asc in Aries (5°), Mars in Gemini → idx 2 → house 3
+        # Venus in Aries (10°), Mars in Gemini → idx 2 → house 3 from Venus.
         result = check_manglik_dosha(planets, ascendant_sidereal=5.0)
         assert result["is_manglik"] is False
 
