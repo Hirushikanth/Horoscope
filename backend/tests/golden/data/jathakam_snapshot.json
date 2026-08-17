@@ -1,0 +1,811 @@
+{
+  "bhavas": [
+    {
+      "dusthana": false,
+      "house_number": 1,
+      "kendra": true,
+      "lord": "Mercury",
+      "rasi": {
+        "english": "Gemini",
+        "sanskrit": "Mithuna",
+        "sinhala": null,
+        "tamil": "Midhunam"
+      },
+      "rasi_index": 2,
+      "trikona": true
+    },
+    {
+      "dusthana": false,
+      "house_number": 2,
+      "kendra": false,
+      "lord": "Moon",
+      "rasi": {
+        "english": "Cancer",
+        "sanskrit": "Karka\u1e6da",
+        "sinhala": null,
+        "tamil": "Kadagam"
+      },
+      "rasi_index": 3,
+      "trikona": false
+    },
+    {
+      "dusthana": false,
+      "house_number": 3,
+      "kendra": false,
+      "lord": "Sun",
+      "rasi": {
+        "english": "Leo",
+        "sanskrit": "Si\u1e43ha",
+        "sinhala": null,
+        "tamil": "Simmam"
+      },
+      "rasi_index": 4,
+      "trikona": false
+    },
+    {
+      "dusthana": false,
+      "house_number": 4,
+      "kendra": true,
+      "lord": "Mercury",
+      "rasi": {
+        "english": "Virgo",
+        "sanskrit": "Kany\u0101",
+        "sinhala": null,
+        "tamil": "Kanni"
+      },
+      "rasi_index": 5,
+      "trikona": false
+    },
+    {
+      "dusthana": false,
+      "house_number": 5,
+      "kendra": false,
+      "lord": "Venus",
+      "rasi": {
+        "english": "Libra",
+        "sanskrit": "Tul\u0101",
+        "sinhala": null,
+        "tamil": "Thulam"
+      },
+      "rasi_index": 6,
+      "trikona": true
+    },
+    {
+      "dusthana": true,
+      "house_number": 6,
+      "kendra": false,
+      "lord": "Mars",
+      "rasi": {
+        "english": "Scorpio",
+        "sanskrit": "V\u1e5b\u015bcika",
+        "sinhala": null,
+        "tamil": "Vrischikam"
+      },
+      "rasi_index": 7,
+      "trikona": false
+    },
+    {
+      "dusthana": false,
+      "house_number": 7,
+      "kendra": true,
+      "lord": "Jupiter",
+      "rasi": {
+        "english": "Sagittarius",
+        "sanskrit": "Dhanus",
+        "sinhala": null,
+        "tamil": "Dhanusu"
+      },
+      "rasi_index": 8,
+      "trikona": false
+    },
+    {
+      "dusthana": true,
+      "house_number": 8,
+      "kendra": false,
+      "lord": "Saturn",
+      "rasi": {
+        "english": "Capricorn",
+        "sanskrit": "Makara",
+        "sinhala": null,
+        "tamil": "Makaram"
+      },
+      "rasi_index": 9,
+      "trikona": false
+    },
+    {
+      "dusthana": false,
+      "house_number": 9,
+      "kendra": false,
+      "lord": "Saturn",
+      "rasi": {
+        "english": "Aquarius",
+        "sanskrit": "Kumbha",
+        "sinhala": null,
+        "tamil": "Kumbam"
+      },
+      "rasi_index": 10,
+      "trikona": true
+    },
+    {
+      "dusthana": false,
+      "house_number": 10,
+      "kendra": true,
+      "lord": "Jupiter",
+      "rasi": {
+        "english": "Pisces",
+        "sanskrit": "M\u012bna",
+        "sinhala": null,
+        "tamil": "Meenam"
+      },
+      "rasi_index": 11,
+      "trikona": false
+    },
+    {
+      "dusthana": false,
+      "house_number": 11,
+      "kendra": false,
+      "lord": "Mars",
+      "rasi": {
+        "english": "Aries",
+        "sanskrit": "Me\u1e63a",
+        "sinhala": null,
+        "tamil": "Mesham"
+      },
+      "rasi_index": 0,
+      "trikona": false
+    },
+    {
+      "dusthana": true,
+      "house_number": 12,
+      "kendra": false,
+      "lord": "Venus",
+      "rasi": {
+        "english": "Taurus",
+        "sanskrit": "V\u1e5b\u1e63abha",
+        "sinhala": null,
+        "tamil": "Rishabam"
+      },
+      "rasi_index": 1,
+      "trikona": false
+    }
+  ],
+  "birth": {
+    "date": "1990-06-15",
+    "jd_ut1": 2448057.5416665305,
+    "latitude": 6.9271,
+    "local_datetime": "1990-06-15T06:30:00+05:30",
+    "longitude": 79.8612,
+    "time": "06:30:00",
+    "timezone": "Asia/Colombo",
+    "utc_datetime": "1990-06-15T01:00:00+00:00"
+  },
+  "chevvai_dosham": {
+    "houses_from_lagna": [],
+    "houses_from_moon": [
+      2
+    ],
+    "houses_from_venus": [
+      12
+    ],
+    "present": true,
+    "reference_count": 2
+  },
+  "dasha": {
+    "balance": {
+      "balance_days": 2190.4496728537556,
+      "balance_years": 5.997124360995908,
+      "fraction_remaining": 0.3331735756108838,
+      "janma_nakshatra_index": 23,
+      "lord": "Rahu",
+      "lord_years": 18.0
+    },
+    "periods": [
+      {
+        "category": "mahadasha",
+        "days": 2190.4496728537556,
+        "end_jd": 2450247.991339384,
+        "end_utc": "2450865-09-01T08:53:46Z",
+        "graha": "Rahu",
+        "start_jd": 2448057.5416665305,
+        "start_utc": "2448674-02-11T18:50:57Z",
+        "years": 5.997124360995908
+      },
+      {
+        "category": "mahadasha",
+        "days": 5844.0,
+        "end_jd": 2456091.991339384,
+        "end_utc": "2456712-08-16T21:12:41Z",
+        "graha": "Jupiter",
+        "start_jd": 2450247.991339384,
+        "start_utc": "2450865-09-01T08:53:46Z",
+        "years": 16.0
+      },
+      {
+        "category": "mahadasha",
+        "days": 6939.75,
+        "end_jd": 2463031.741339384,
+        "end_utc": "2463655-11-20T23:01:29Z",
+        "graha": "Saturn",
+        "start_jd": 2456091.991339384,
+        "start_utc": "2456712-08-16T21:12:41Z",
+        "years": 19.0
+      },
+      {
+        "category": "mahadasha",
+        "days": 6209.25,
+        "end_jd": 2469240.991339384,
+        "end_utc": "2469868-04-16T22:40:54Z",
+        "graha": "Mercury",
+        "start_jd": 2463031.741339384,
+        "start_utc": "2463655-11-20T23:01:29Z",
+        "years": 17.0
+      },
+      {
+        "category": "mahadasha",
+        "days": 2556.75,
+        "end_jd": 2471797.741339384,
+        "end_utc": "2472426-05-06T03:16:38Z",
+        "graha": "Ketu",
+        "start_jd": 2469240.991339384,
+        "start_utc": "2469868-04-16T22:40:54Z",
+        "years": 7.0
+      },
+      {
+        "category": "mahadasha",
+        "days": 7305.0,
+        "end_jd": 2479102.741339384,
+        "end_utc": "2479735-01-25T12:57:18Z",
+        "graha": "Venus",
+        "start_jd": 2471797.741339384,
+        "start_utc": "2472426-05-06T03:16:38Z",
+        "years": 20.0
+      },
+      {
+        "category": "mahadasha",
+        "days": 2191.5,
+        "end_jd": 2481294.241339384,
+        "end_utc": "2481927-09-10T10:41:22Z",
+        "graha": "Sun",
+        "start_jd": 2479102.741339384,
+        "start_utc": "2479735-01-25T12:57:18Z",
+        "years": 6.0
+      },
+      {
+        "category": "mahadasha",
+        "days": 3652.5,
+        "end_jd": 2484946.741339384,
+        "end_utc": "2485582-01-21T18:11:15Z",
+        "graha": "Moon",
+        "start_jd": 2481294.241339384,
+        "start_utc": "2481927-09-10T10:41:22Z",
+        "years": 10.0
+      },
+      {
+        "category": "mahadasha",
+        "days": 2556.75,
+        "end_jd": 2487503.491339384,
+        "end_utc": "2488140-02-10T23:22:11Z",
+        "graha": "Mars",
+        "start_jd": 2484946.741339384,
+        "start_utc": "2485582-01-21T18:11:15Z",
+        "years": 7.0
+      },
+      {
+        "category": "mahadasha",
+        "days": 6574.5,
+        "end_jd": 2494077.991339384,
+        "end_utc": "2494717-12-28T22:29:06Z",
+        "graha": "Rahu",
+        "start_jd": 2487503.491339384,
+        "start_utc": "2488140-02-10T23:22:11Z",
+        "years": 18.0
+      }
+    ],
+    "year_length_days": 365.25
+  },
+  "grahas": [
+    {
+      "combust": false,
+      "combustion_separation_deg": null,
+      "degree_in_sign_deg": 29.985732392566078,
+      "dignity": {
+        "degree_in_sign_deg": 29.985732392566078,
+        "dignity": "neutral",
+        "distance_from_exaltation_deg": null,
+        "rasi_index": 1
+      },
+      "distance_au": 1.0157196973474303,
+      "house_number": 12,
+      "nakshatra": {
+        "english": "Mrigashira",
+        "sanskrit": "M\u1e5bga\u015bira",
+        "sinhala": null,
+        "tamil": "Mrigasheersham"
+      },
+      "nakshatra_index": 4,
+      "name": "Sun",
+      "names": {
+        "english": "Sun",
+        "sanskrit": "S\u016brya",
+        "sinhala": null,
+        "tamil": "\u0b9a\u0bc2\u0bb0\u0bbf\u0baf\u0ba9\u0bcd"
+      },
+      "navamsa_rasi": {
+        "english": "Virgo",
+        "sanskrit": "Kany\u0101",
+        "sinhala": null,
+        "tamil": "Kanni"
+      },
+      "navamsa_rasi_index": 5,
+      "pada": 2,
+      "rasi": {
+        "english": "Taurus",
+        "sanskrit": "V\u1e5b\u1e63abha",
+        "sinhala": null,
+        "tamil": "Rishabam"
+      },
+      "rasi_index": 1,
+      "retrograde": false,
+      "sidereal_longitude_deg": 59.98573239256608,
+      "tropical_longitude_deg": 83.69739497043152,
+      "vargottama": false
+    },
+    {
+      "combust": false,
+      "combustion_separation_deg": 104.42804673404447,
+      "degree_in_sign_deg": 15.557685658521564,
+      "dignity": {
+        "degree_in_sign_deg": 15.557685658521564,
+        "dignity": "neutral",
+        "distance_from_exaltation_deg": null,
+        "rasi_index": 10
+      },
+      "distance_au": 0.002557868765384594,
+      "house_number": 9,
+      "nakshatra": {
+        "english": "Shatabhisha",
+        "sanskrit": "\u015aatabhi\u1e63\u0101",
+        "sinhala": "Satha",
+        "tamil": "Sadayam"
+      },
+      "nakshatra_index": 23,
+      "name": "Moon",
+      "names": {
+        "english": "Moon",
+        "sanskrit": "Candra",
+        "sinhala": null,
+        "tamil": "\u0b9a\u0ba8\u0bcd\u0ba4\u0bbf\u0bb0\u0ba9\u0bcd"
+      },
+      "navamsa_rasi": {
+        "english": "Aquarius",
+        "sanskrit": "Kumbha",
+        "sinhala": null,
+        "tamil": "Kumbam"
+      },
+      "navamsa_rasi_index": 10,
+      "pada": 3,
+      "rasi": {
+        "english": "Aquarius",
+        "sanskrit": "Kumbha",
+        "sinhala": null,
+        "tamil": "Kumbam"
+      },
+      "rasi_index": 10,
+      "retrograde": false,
+      "sidereal_longitude_deg": 315.55768565852156,
+      "tropical_longitude_deg": 339.26934823638703,
+      "vargottama": true
+    },
+    {
+      "combust": false,
+      "combustion_separation_deg": 72.98404630099571,
+      "degree_in_sign_deg": 17.001686091570377,
+      "dignity": {
+        "degree_in_sign_deg": 17.001686091570377,
+        "dignity": "neutral",
+        "distance_from_exaltation_deg": null,
+        "rasi_index": 11
+      },
+      "distance_au": 1.2816185110125888,
+      "house_number": 10,
+      "nakshatra": {
+        "english": "Revati",
+        "sanskrit": "Revat\u012b",
+        "sinhala": "Revathi",
+        "tamil": "Revathi"
+      },
+      "nakshatra_index": 26,
+      "name": "Mars",
+      "names": {
+        "english": "Mars",
+        "sanskrit": "Ma\u1e45gala",
+        "sinhala": null,
+        "tamil": "\u0b9a\u0bc6\u0bb5\u0bcd\u0bb5\u0bbe\u0baf\u0bcd"
+      },
+      "navamsa_rasi": {
+        "english": "Sagittarius",
+        "sanskrit": "Dhanus",
+        "sinhala": null,
+        "tamil": "Dhanusu"
+      },
+      "navamsa_rasi_index": 8,
+      "pada": 1,
+      "rasi": {
+        "english": "Pisces",
+        "sanskrit": "M\u012bna",
+        "sinhala": null,
+        "tamil": "Meenam"
+      },
+      "rasi_index": 11,
+      "retrograde": false,
+      "sidereal_longitude_deg": 347.0016860915704,
+      "tropical_longitude_deg": 10.71334866943581,
+      "vargottama": false
+    },
+    {
+      "combust": false,
+      "combustion_separation_deg": 18.783024970749096,
+      "degree_in_sign_deg": 11.202707421816982,
+      "dignity": {
+        "degree_in_sign_deg": 11.202707421816982,
+        "dignity": "neutral",
+        "distance_from_exaltation_deg": null,
+        "rasi_index": 1
+      },
+      "distance_au": 1.1020173775314746,
+      "house_number": 12,
+      "nakshatra": {
+        "english": "Rohini",
+        "sanskrit": "Rohi\u1e47\u012b",
+        "sinhala": "Rehenu",
+        "tamil": "Rohini"
+      },
+      "nakshatra_index": 3,
+      "name": "Mercury",
+      "names": {
+        "english": "Mercury",
+        "sanskrit": "Budha",
+        "sinhala": null,
+        "tamil": "\u0baa\u0bc1\u0ba4\u0ba9\u0bcd"
+      },
+      "navamsa_rasi": {
+        "english": "Aries",
+        "sanskrit": "Me\u1e63a",
+        "sinhala": null,
+        "tamil": "Mesham"
+      },
+      "navamsa_rasi_index": 0,
+      "pada": 1,
+      "rasi": {
+        "english": "Taurus",
+        "sanskrit": "V\u1e5b\u1e63abha",
+        "sinhala": null,
+        "tamil": "Rishabam"
+      },
+      "rasi_index": 1,
+      "retrograde": false,
+      "sidereal_longitude_deg": 41.20270742181698,
+      "tropical_longitude_deg": 64.91436999968242,
+      "vargottama": false
+    },
+    {
+      "combust": false,
+      "combustion_separation_deg": 22.098032892885442,
+      "degree_in_sign_deg": 22.08376528545152,
+      "dignity": {
+        "degree_in_sign_deg": 22.08376528545152,
+        "dignity": "neutral",
+        "distance_from_exaltation_deg": null,
+        "rasi_index": 2
+      },
+      "distance_au": 6.137730205389221,
+      "house_number": 1,
+      "nakshatra": {
+        "english": "Punarvasu",
+        "sanskrit": "Punarvasu",
+        "sinhala": "Punarvasu",
+        "tamil": "Punarpoosam"
+      },
+      "nakshatra_index": 6,
+      "name": "Jupiter",
+      "names": {
+        "english": "Jupiter",
+        "sanskrit": "B\u1e5bhaspati",
+        "sinhala": null,
+        "tamil": "\u0b95\u0bc1\u0bb0\u0bc1"
+      },
+      "navamsa_rasi": {
+        "english": "Aries",
+        "sanskrit": "Me\u1e63a",
+        "sinhala": null,
+        "tamil": "Mesham"
+      },
+      "navamsa_rasi_index": 0,
+      "pada": 1,
+      "rasi": {
+        "english": "Gemini",
+        "sanskrit": "Mithuna",
+        "sinhala": null,
+        "tamil": "Midhunam"
+      },
+      "rasi_index": 2,
+      "retrograde": false,
+      "sidereal_longitude_deg": 82.08376528545152,
+      "tropical_longitude_deg": 105.79542786331696,
+      "vargottama": false
+    },
+    {
+      "combust": false,
+      "combustion_separation_deg": 35.45410545316886,
+      "degree_in_sign_deg": 24.53162693939722,
+      "dignity": {
+        "degree_in_sign_deg": 24.53162693939722,
+        "dignity": "neutral",
+        "distance_from_exaltation_deg": null,
+        "rasi_index": 0
+      },
+      "distance_au": 1.2517312262742355,
+      "house_number": 11,
+      "nakshatra": {
+        "english": "Bharani",
+        "sanskrit": "Bhara\u1e47\u012b",
+        "sinhala": "Kethi",
+        "tamil": "Bharani"
+      },
+      "nakshatra_index": 1,
+      "name": "Venus",
+      "names": {
+        "english": "Venus",
+        "sanskrit": "\u015aukra",
+        "sinhala": null,
+        "tamil": "\u0b9a\u0bc1\u0b95\u0bcd\u0b95\u0bbf\u0bb0\u0ba9\u0bcd"
+      },
+      "navamsa_rasi": {
+        "english": "Scorpio",
+        "sanskrit": "V\u1e5b\u015bcika",
+        "sinhala": null,
+        "tamil": "Vrischikam"
+      },
+      "navamsa_rasi_index": 7,
+      "pada": 4,
+      "rasi": {
+        "english": "Aries",
+        "sanskrit": "Me\u1e63a",
+        "sinhala": null,
+        "tamil": "Mesham"
+      },
+      "rasi_index": 0,
+      "retrograde": false,
+      "sidereal_longitude_deg": 24.53162693939722,
+      "tropical_longitude_deg": 48.24328951726266,
+      "vargottama": false
+    },
+    {
+      "combust": false,
+      "combustion_separation_deg": 149.64351156403217,
+      "degree_in_sign_deg": 0.34222082853386837,
+      "dignity": {
+        "degree_in_sign_deg": 0.34222082853386837,
+        "dignity": "own_sign",
+        "distance_from_exaltation_deg": null,
+        "rasi_index": 9
+      },
+      "distance_au": 9.123607030654457,
+      "house_number": 8,
+      "nakshatra": {
+        "english": "Uttara Ashadha",
+        "sanskrit": "Uttar\u0101\u1e63\u0101\u1e0dh\u0101",
+        "sinhala": "Uttrashada",
+        "tamil": "Uthiraadam"
+      },
+      "nakshatra_index": 20,
+      "name": "Saturn",
+      "names": {
+        "english": "Saturn",
+        "sanskrit": "\u015aani",
+        "sinhala": null,
+        "tamil": "\u0b9a\u0ba9\u0bbf"
+      },
+      "navamsa_rasi": {
+        "english": "Capricorn",
+        "sanskrit": "Makara",
+        "sinhala": null,
+        "tamil": "Makaram"
+      },
+      "navamsa_rasi_index": 9,
+      "pada": 2,
+      "rasi": {
+        "english": "Capricorn",
+        "sanskrit": "Makara",
+        "sinhala": null,
+        "tamil": "Makaram"
+      },
+      "rasi_index": 9,
+      "retrograde": true,
+      "sidereal_longitude_deg": 270.34222082853387,
+      "tropical_longitude_deg": 294.05388340639934,
+      "vargottama": true
+    },
+    {
+      "combust": false,
+      "combustion_separation_deg": null,
+      "degree_in_sign_deg": 16.006920370091166,
+      "dignity": {
+        "degree_in_sign_deg": 16.006920370091166,
+        "dignity": "neutral",
+        "distance_from_exaltation_deg": null,
+        "rasi_index": 9
+      },
+      "distance_au": 0.0,
+      "house_number": 8,
+      "nakshatra": {
+        "english": "Shravana",
+        "sanskrit": "\u015arava\u1e47a",
+        "sinhala": "Suvana",
+        "tamil": "Thiruvonam"
+      },
+      "nakshatra_index": 21,
+      "name": "Rahu",
+      "names": {
+        "english": "Rahu",
+        "sanskrit": "R\u0101hu",
+        "sinhala": null,
+        "tamil": "\u0bb0\u0bbe\u0b95\u0bc1"
+      },
+      "navamsa_rasi": {
+        "english": "Taurus",
+        "sanskrit": "V\u1e5b\u1e63abha",
+        "sinhala": null,
+        "tamil": "Rishabam"
+      },
+      "navamsa_rasi_index": 1,
+      "pada": 2,
+      "rasi": {
+        "english": "Capricorn",
+        "sanskrit": "Makara",
+        "sinhala": null,
+        "tamil": "Makaram"
+      },
+      "rasi_index": 9,
+      "retrograde": true,
+      "sidereal_longitude_deg": 286.00692037009117,
+      "tropical_longitude_deg": 309.71858294795663,
+      "vargottama": false
+    },
+    {
+      "combust": false,
+      "combustion_separation_deg": null,
+      "degree_in_sign_deg": 16.006920370091194,
+      "dignity": {
+        "degree_in_sign_deg": 16.006920370091194,
+        "dignity": "neutral",
+        "distance_from_exaltation_deg": null,
+        "rasi_index": 3
+      },
+      "distance_au": 0.0,
+      "house_number": 2,
+      "nakshatra": {
+        "english": "Pushya",
+        "sanskrit": "Pu\u1e63ya",
+        "sinhala": "Pussa",
+        "tamil": "Poosam"
+      },
+      "nakshatra_index": 7,
+      "name": "Ketu",
+      "names": {
+        "english": "Ketu",
+        "sanskrit": "Ketu",
+        "sinhala": null,
+        "tamil": "\u0b95\u0bc7\u0ba4\u0bc1"
+      },
+      "navamsa_rasi": {
+        "english": "Scorpio",
+        "sanskrit": "V\u1e5b\u015bcika",
+        "sinhala": null,
+        "tamil": "Vrischikam"
+      },
+      "navamsa_rasi_index": 7,
+      "pada": 4,
+      "rasi": {
+        "english": "Cancer",
+        "sanskrit": "Karka\u1e6da",
+        "sinhala": null,
+        "tamil": "Kadagam"
+      },
+      "rasi_index": 3,
+      "retrograde": true,
+      "sidereal_longitude_deg": 106.0069203700912,
+      "tropical_longitude_deg": 129.71858294795663,
+      "vargottama": false
+    }
+  ],
+  "lagna": {
+    "degree_in_sign_deg": 7.147846580118113,
+    "navamsa_rasi": {
+      "english": "Sagittarius",
+      "sanskrit": "Dhanus",
+      "sinhala": null,
+      "tamil": "Dhanusu"
+    },
+    "navamsa_rasi_index": 8,
+    "rasi": {
+      "english": "Gemini",
+      "sanskrit": "Mithuna",
+      "sinhala": null,
+      "tamil": "Midhunam"
+    },
+    "rasi_index": 2,
+    "sidereal_longitude_deg": 67.14784658011811
+  },
+  "meta": {
+    "ayanamsa": {
+      "definition": "Chitra (Spica) fixed at 180\u00b0 sidereal (Chitrapaksha)",
+      "system": "lahiri",
+      "value_deg": 23.71166257786544
+    },
+    "ephemeris": {
+      "accuracy": "sub-arcsecond (Park et al. 2021)",
+      "coverage": {
+        "end": "2650-01-25",
+        "start": "1550-01-01"
+      },
+      "name": "de440.bsp",
+      "source": "NASA JPL DE440"
+    },
+    "node_convention": "mean",
+    "precision": "IEEE 754 float64",
+    "tradition": "Thirukanitham (Drik Ganita)",
+    "version": "2.0.0"
+  },
+  "panchangam": {
+    "karana": {
+      "index": 0,
+      "name": {
+        "english": "Bava",
+        "sanskrit": "Bava",
+        "sinhala": null,
+        "tamil": null
+      }
+    },
+    "nakshatra": {
+      "index": 23,
+      "lord": "Rahu",
+      "name": {
+        "english": "Shatabhisha",
+        "sanskrit": "\u015aatabhi\u1e63\u0101",
+        "sinhala": "Satha",
+        "tamil": "Sadayam"
+      },
+      "pada": 3
+    },
+    "tithi": {
+      "index": 21,
+      "name": {
+        "english": "Saptami",
+        "sanskrit": "Saptam\u012b",
+        "sinhala": null,
+        "tamil": "Sapthami"
+      },
+      "number": 22,
+      "paksha": "krishna"
+    },
+    "vara": {
+      "index": 5,
+      "name": {
+        "english": "Friday",
+        "sanskrit": "\u015aukrav\u0101ra",
+        "sinhala": "Sikuraada",
+        "tamil": "Velli"
+      }
+    },
+    "yoga": {
+      "index": 1,
+      "name": {
+        "english": "Priti",
+        "sanskrit": "Pr\u012bti",
+        "sinhala": null,
+        "tamil": null
+      }
+    }
+  }
+}

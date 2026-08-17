@@ -1,0 +1,1070 @@
+{
+  "meta": {
+    "version": "2.0.0",
+    "tradition": "Thirukanitham (Drik Ganita)",
+    "precision": "IEEE 754 float64",
+    "ephemeris": {
+      "name": "de440.bsp",
+      "source": "NASA JPL DE440",
+      "coverage": {
+        "start": "1550-01-01",
+        "end": "2650-01-25"
+      },
+      "accuracy": "sub-arcsecond (Park et al. 2021)"
+    },
+    "ayanamsa": {
+      "system": "lahiri",
+      "value_deg": 23.71166257786544,
+      "definition": "Chitra (Spica) fixed at 180\u00b0 sidereal (Chitrapaksha)"
+    },
+    "node_convention": "mean"
+  },
+  "birth": {
+    "date": "1990-06-15",
+    "time": "06:30:00",
+    "timezone": "Asia/Colombo",
+    "latitude": 6.9271,
+    "longitude": 79.8612,
+    "local_datetime": "1990-06-15T06:30:00+05:30",
+    "utc_datetime": "1990-06-15T01:00:00+00:00",
+    "jd_ut1": 2448057.5416665305
+  },
+  "stars": [
+    {
+      "hip_id": 32349,
+      "name": "Sirius",
+      "designation": "Alpha Canis Majoris",
+      "sanskrit_name": "Lubdhaka",
+      "associated_nakshatra_index": null,
+      "associated_nakshatra": null,
+      "magnitude": -1.44,
+      "ra_hours": 6.7526680908061705,
+      "dec_degrees": -16.709831745205808,
+      "distance_light_years": 8.600955100112342,
+      "tropical_longitude_deg": 103.9549229065369,
+      "sidereal_longitude_deg": 80.24326032867145,
+      "ecliptic_latitude_deg": -39.599885657572415,
+      "rasi_index": 2,
+      "rasi": {
+        "english": "Gemini",
+        "sanskrit": "Mithuna",
+        "tamil": "Midhunam",
+        "sinhala": null
+      },
+      "nakshatra_index": 6,
+      "proper_motion_ra_mas_per_year": -546.01,
+      "proper_motion_dec_mas_per_year": -1223.08
+    },
+    {
+      "hip_id": 30438,
+      "name": "Canopus",
+      "designation": "Alpha Carinae",
+      "sanskrit_name": "Agastya",
+      "associated_nakshatra_index": null,
+      "associated_nakshatra": null,
+      "magnitude": -0.62,
+      "ra_hours": 6.39918594446705,
+      "dec_degrees": -52.695777967348725,
+      "distance_light_years": 312.7098575702086,
+      "tropical_longitude_deg": 104.83210163614288,
+      "sidereal_longitude_deg": 81.12043905827744,
+      "ecliptic_latitude_deg": -75.82517557412201,
+      "rasi_index": 2,
+      "rasi": {
+        "english": "Gemini",
+        "sanskrit": "Mithuna",
+        "tamil": "Midhunam",
+        "sinhala": null
+      },
+      "nakshatra_index": 6,
+      "proper_motion_ra_mas_per_year": 19.99,
+      "proper_motion_dec_mas_per_year": 23.67
+    },
+    {
+      "hip_id": 69673,
+      "name": "Arcturus",
+      "designation": "Alpha Bo\u00f6tis",
+      "sanskrit_name": "Sv\u0101t\u012b",
+      "associated_nakshatra_index": 14,
+      "associated_nakshatra": {
+        "english": "Swati",
+        "sanskrit": "Sv\u0101t\u012b",
+        "tamil": "Swaathi",
+        "sinhala": "Swathi"
+      },
+      "magnitude": -0.05,
+      "ra_hours": 14.261411088391972,
+      "dec_degrees": 19.19258715906781,
+      "distance_light_years": 36.708645740587336,
+      "tropical_longitude_deg": 204.10457555866034,
+      "sidereal_longitude_deg": 180.3929129807949,
+      "ecliptic_latitude_deg": 30.748370386869674,
+      "rasi_index": 6,
+      "rasi": {
+        "english": "Libra",
+        "sanskrit": "Tul\u0101",
+        "tamil": "Thulam",
+        "sinhala": null
+      },
+      "nakshatra_index": 13,
+      "proper_motion_ra_mas_per_year": -1093.45,
+      "proper_motion_dec_mas_per_year": -1999.4
+    },
+    {
+      "hip_id": 91262,
+      "name": "Vega",
+      "designation": "Alpha Lyrae",
+      "sanskrit_name": "Abhijit",
+      "associated_nakshatra_index": null,
+      "associated_nakshatra": null,
+      "magnitude": 0.03,
+      "ra_hours": 18.615562409734963,
+      "dec_degrees": 38.78226201604327,
+      "distance_light_years": 25.297160199168065,
+      "tropical_longitude_deg": 285.18487471368155,
+      "sidereal_longitude_deg": 261.4732121358161,
+      "ecliptic_latitude_deg": 61.73274452206495,
+      "rasi_index": 8,
+      "rasi": {
+        "english": "Sagittarius",
+        "sanskrit": "Dhanus",
+        "tamil": "Dhanusu",
+        "sinhala": null
+      },
+      "nakshatra_index": 19,
+      "proper_motion_ra_mas_per_year": 201.02,
+      "proper_motion_dec_mas_per_year": 287.46
+    },
+    {
+      "hip_id": 24608,
+      "name": "Capella",
+      "designation": "Alpha Aurigae",
+      "sanskrit_name": "Brahmah\u1e5bdaya",
+      "associated_nakshatra_index": null,
+      "associated_nakshatra": null,
+      "magnitude": 0.08,
+      "ra_hours": 5.278118593042134,
+      "dec_degrees": 46.00015375611305,
+      "distance_light_years": 42.19905446501461,
+      "tropical_longitude_deg": 81.72791885588315,
+      "sidereal_longitude_deg": 58.01625627801771,
+      "ecliptic_latitude_deg": 22.865215840646833,
+      "rasi_index": 1,
+      "rasi": {
+        "english": "Taurus",
+        "sanskrit": "V\u1e5b\u1e63abha",
+        "tamil": "Rishabam",
+        "sinhala": null
+      },
+      "nakshatra_index": 4,
+      "proper_motion_ra_mas_per_year": 75.52,
+      "proper_motion_dec_mas_per_year": -427.13
+    },
+    {
+      "hip_id": 24436,
+      "name": "Rigel",
+      "designation": "Beta Orionis",
+      "sanskrit_name": "Tri\u015ba\u1e45ku",
+      "associated_nakshatra_index": null,
+      "associated_nakshatra": null,
+      "magnitude": 0.18,
+      "ra_hours": 5.242297240573119,
+      "dec_degrees": -8.201637083342327,
+      "distance_light_years": 772.8824250652331,
+      "tropical_longitude_deg": 76.69967375689055,
+      "sidereal_longitude_deg": 52.98801117902511,
+      "ecliptic_latitude_deg": -31.12399142910725,
+      "rasi_index": 1,
+      "rasi": {
+        "english": "Taurus",
+        "sanskrit": "V\u1e5b\u1e63abha",
+        "tamil": "Rishabam",
+        "sinhala": null
+      },
+      "nakshatra_index": 3,
+      "proper_motion_ra_mas_per_year": 1.87,
+      "proper_motion_dec_mas_per_year": -0.56
+    },
+    {
+      "hip_id": 37279,
+      "name": "Procyon",
+      "designation": "Alpha Canis Minoris",
+      "sanskrit_name": "M\u1e5bgavy\u0101dha",
+      "associated_nakshatra_index": null,
+      "associated_nakshatra": null,
+      "magnitude": 0.4,
+      "ra_hours": 7.655274100713439,
+      "dec_degrees": 5.23027765732722,
+      "distance_light_years": 11.406874149804011,
+      "tropical_longitude_deg": 115.65864814542873,
+      "sidereal_longitude_deg": 91.94698556756329,
+      "ecliptic_latitude_deg": -16.01484322418748,
+      "rasi_index": 3,
+      "rasi": {
+        "english": "Cancer",
+        "sanskrit": "Karka\u1e6da",
+        "tamil": "Kadagam",
+        "sinhala": null
+      },
+      "nakshatra_index": 6,
+      "proper_motion_ra_mas_per_year": -716.57,
+      "proper_motion_dec_mas_per_year": -1034.58
+    },
+    {
+      "hip_id": 27989,
+      "name": "Betelgeuse",
+      "designation": "Alpha Orionis",
+      "sanskrit_name": "\u0100rdr\u0101",
+      "associated_nakshatra_index": 5,
+      "associated_nakshatra": {
+        "english": "Ardra",
+        "sanskrit": "\u0100rdr\u0101",
+        "tamil": "Thiruvaathirai",
+        "sinhala": "Ada"
+      },
+      "magnitude": 0.45,
+      "ra_hours": 5.919519888160181,
+      "dec_degrees": 7.407008126851952,
+      "distance_light_years": 427.4657789668339,
+      "tropical_longitude_deg": 88.62467599883146,
+      "sidereal_longitude_deg": 64.91301342096602,
+      "ecliptic_latitude_deg": -16.028297810328255,
+      "rasi_index": 2,
+      "rasi": {
+        "english": "Gemini",
+        "sanskrit": "Mithuna",
+        "tamil": "Midhunam",
+        "sinhala": null
+      },
+      "nakshatra_index": 4,
+      "proper_motion_ra_mas_per_year": 27.33,
+      "proper_motion_dec_mas_per_year": 10.86
+    },
+    {
+      "hip_id": 7588,
+      "name": "Achernar",
+      "designation": "Alpha Eridani",
+      "sanskrit_name": "Agni Sthamba",
+      "associated_nakshatra_index": null,
+      "associated_nakshatra": null,
+      "magnitude": 0.45,
+      "ra_hours": 1.628513996627553,
+      "dec_degrees": -57.23654984255048,
+      "distance_light_years": 143.8079254287807,
+      "tropical_longitude_deg": 345.17908504107476,
+      "sidereal_longitude_deg": 321.46742246320935,
+      "ecliptic_latitude_deg": -59.37748876678228,
+      "rasi_index": 10,
+      "rasi": {
+        "english": "Aquarius",
+        "sanskrit": "Kumbha",
+        "tamil": "Kumbam",
+        "sinhala": null
+      },
+      "nakshatra_index": 24,
+      "proper_motion_ra_mas_per_year": 88.02,
+      "proper_motion_dec_mas_per_year": -40.08
+    },
+    {
+      "hip_id": 97649,
+      "name": "Altair",
+      "designation": "Alpha Aquilae",
+      "sanskrit_name": "\u015arava\u1e47a",
+      "associated_nakshatra_index": 21,
+      "associated_nakshatra": {
+        "english": "Shravana",
+        "sanskrit": "\u015arava\u1e47a",
+        "tamil": "Thiruvonam",
+        "sinhala": "Suvana"
+      },
+      "magnitude": 0.76,
+      "ra_hours": 19.84620642670337,
+      "dec_degrees": 8.866390192921635,
+      "distance_light_years": 16.77412893820605,
+      "tropical_longitude_deg": 301.6435388697161,
+      "sidereal_longitude_deg": 277.9318762918507,
+      "ecliptic_latitude_deg": 29.303132663879534,
+      "rasi_index": 9,
+      "rasi": {
+        "english": "Capricorn",
+        "sanskrit": "Makara",
+        "tamil": "Makaram",
+        "sinhala": null
+      },
+      "nakshatra_index": 20,
+      "proper_motion_ra_mas_per_year": 536.82,
+      "proper_motion_dec_mas_per_year": 385.54
+    },
+    {
+      "hip_id": 21421,
+      "name": "Aldebaran",
+      "designation": "Alpha Tauri",
+      "sanskrit_name": "Rohi\u1e47\u012b",
+      "associated_nakshatra_index": 3,
+      "associated_nakshatra": {
+        "english": "Rohini",
+        "sanskrit": "Rohi\u1e47\u012b",
+        "tamil": "Rohini",
+        "sinhala": "Rehenu"
+      },
+      "magnitude": 0.87,
+      "ra_hours": 4.598655441634929,
+      "dec_degrees": 16.510265657313347,
+      "distance_light_years": 65.11408570470667,
+      "tropical_longitude_deg": 69.65917754911878,
+      "sidereal_longitude_deg": 45.94751497125334,
+      "ecliptic_latitude_deg": -5.467524630994891,
+      "rasi_index": 1,
+      "rasi": {
+        "english": "Taurus",
+        "sanskrit": "V\u1e5b\u1e63abha",
+        "tamil": "Rishabam",
+        "sinhala": null
+      },
+      "nakshatra_index": 3,
+      "proper_motion_ra_mas_per_year": 62.78,
+      "proper_motion_dec_mas_per_year": -189.36
+    },
+    {
+      "hip_id": 65474,
+      "name": "Spica",
+      "designation": "Alpha Virginis",
+      "sanskrit_name": "Citr\u0101",
+      "associated_nakshatra_index": 13,
+      "associated_nakshatra": {
+        "english": "Chitra",
+        "sanskrit": "Citr\u0101",
+        "tamil": "Chithirai",
+        "sinhala": "Siththa"
+      },
+      "magnitude": 0.98,
+      "ra_hours": 13.41989054958345,
+      "dec_degrees": -11.161234219640303,
+      "distance_light_years": 262.1835752738067,
+      "tropical_longitude_deg": 203.71166257786544,
+      "sidereal_longitude_deg": 180.0,
+      "ecliptic_latitude_deg": -2.0537644265663606,
+      "rasi_index": 6,
+      "rasi": {
+        "english": "Libra",
+        "sanskrit": "Tul\u0101",
+        "tamil": "Thulam",
+        "sinhala": null
+      },
+      "nakshatra_index": 13,
+      "proper_motion_ra_mas_per_year": -42.5,
+      "proper_motion_dec_mas_per_year": -31.73
+    },
+    {
+      "hip_id": 80763,
+      "name": "Antares",
+      "designation": "Alpha Scorpii",
+      "sanskrit_name": "Jye\u1e63\u1e6dh\u0101",
+      "associated_nakshatra_index": 17,
+      "associated_nakshatra": {
+        "english": "Jyeshtha",
+        "sanskrit": "Jye\u1e63\u1e6dh\u0101",
+        "tamil": "Kettai",
+        "sinhala": "Keta"
+      },
+      "magnitude": 1.06,
+      "ra_hours": 16.490131846921226,
+      "dec_degrees": -26.431884580420558,
+      "distance_light_years": 603.9932763674284,
+      "tropical_longitude_deg": 249.63255230933117,
+      "sidereal_longitude_deg": 225.92088973146573,
+      "ecliptic_latitude_deg": -4.5686232759995375,
+      "rasi_index": 7,
+      "rasi": {
+        "english": "Scorpio",
+        "sanskrit": "V\u1e5b\u015bcika",
+        "tamil": "Vrischikam",
+        "sinhala": null
+      },
+      "nakshatra_index": 16,
+      "proper_motion_ra_mas_per_year": -10.16,
+      "proper_motion_dec_mas_per_year": -23.21
+    },
+    {
+      "hip_id": 37826,
+      "name": "Pollux",
+      "designation": "Beta Geminorum",
+      "sanskrit_name": "Punarvas\u016b",
+      "associated_nakshatra_index": 6,
+      "associated_nakshatra": {
+        "english": "Punarvasu",
+        "sanskrit": "Punarvasu",
+        "tamil": "Punarpoosam",
+        "sinhala": "Punarvasu"
+      },
+      "magnitude": 1.16,
+      "ra_hours": 7.755503140378654,
+      "dec_degrees": 28.02643182509019,
+      "distance_light_years": 33.71475213749267,
+      "tropical_longitude_deg": 113.08886534880267,
+      "sidereal_longitude_deg": 89.37720277093723,
+      "ecliptic_latitude_deg": 6.6838938612687135,
+      "rasi_index": 2,
+      "rasi": {
+        "english": "Gemini",
+        "sanskrit": "Mithuna",
+        "tamil": "Midhunam",
+        "sinhala": null
+      },
+      "nakshatra_index": 6,
+      "proper_motion_ra_mas_per_year": -625.69,
+      "proper_motion_dec_mas_per_year": -45.95
+    },
+    {
+      "hip_id": 113368,
+      "name": "Fomalhaut",
+      "designation": "Alpha Piscis Austrini",
+      "sanskrit_name": "Hasta Mina",
+      "associated_nakshatra_index": null,
+      "associated_nakshatra": null,
+      "magnitude": 1.17,
+      "ra_hours": 22.96072047198122,
+      "dec_degrees": -29.621391407077628,
+      "distance_light_years": 25.073517151765977,
+      "tropical_longitude_deg": 333.7287739001702,
+      "sidereal_longitude_deg": 310.0171113223048,
+      "ecliptic_latitude_deg": -21.1337328766865,
+      "rasi_index": 10,
+      "rasi": {
+        "english": "Aquarius",
+        "sanskrit": "Kumbha",
+        "tamil": "Kumbam",
+        "sinhala": null
+      },
+      "nakshatra_index": 23,
+      "proper_motion_ra_mas_per_year": 329.22,
+      "proper_motion_dec_mas_per_year": -164.22
+    },
+    {
+      "hip_id": 49669,
+      "name": "Regulus",
+      "designation": "Alpha Leonis",
+      "sanskrit_name": "Magh\u0101",
+      "associated_nakshatra_index": 9,
+      "associated_nakshatra": {
+        "english": "Magha",
+        "sanskrit": "Magh\u0101",
+        "tamil": "Makam",
+        "sinhala": "Maka"
+      },
+      "magnitude": 1.36,
+      "ra_hours": 10.13961643522299,
+      "dec_degrees": 11.967185882717677,
+      "distance_light_years": 77.49023643010929,
+      "tropical_longitude_deg": 149.70050562246624,
+      "sidereal_longitude_deg": 125.9888430446008,
+      "ecliptic_latitude_deg": 0.4647408011065834,
+      "rasi_index": 4,
+      "rasi": {
+        "english": "Leo",
+        "sanskrit": "Si\u1e43ha",
+        "tamil": "Simmam",
+        "sinhala": null
+      },
+      "nakshatra_index": 9,
+      "proper_motion_ra_mas_per_year": -249.4,
+      "proper_motion_dec_mas_per_year": 4.91
+    },
+    {
+      "hip_id": 85927,
+      "name": "Shaula",
+      "designation": "Lambda Scorpii",
+      "sanskrit_name": "M\u016bla",
+      "associated_nakshatra_index": 18,
+      "associated_nakshatra": {
+        "english": "Mula",
+        "sanskrit": "M\u016bla",
+        "tamil": "Moolam",
+        "sinhala": "Mula"
+      },
+      "magnitude": 1.62,
+      "ra_hours": 17.560148222013392,
+      "dec_degrees": -37.10366922716774,
+      "distance_light_years": 702.9232120408473,
+      "tropical_longitude_deg": 264.45594772179686,
+      "sidereal_longitude_deg": 240.74428514393142,
+      "ecliptic_latitude_deg": -13.78706082491097,
+      "rasi_index": 8,
+      "rasi": {
+        "english": "Sagittarius",
+        "sanskrit": "Dhanus",
+        "tamil": "Dhanusu",
+        "sinhala": null
+      },
+      "nakshatra_index": 18,
+      "proper_motion_ra_mas_per_year": -8.9,
+      "proper_motion_dec_mas_per_year": -29.95
+    },
+    {
+      "hip_id": 11767,
+      "name": "Polaris",
+      "designation": "Alpha Ursae Minoris",
+      "sanskrit_name": "Dhruva",
+      "associated_nakshatra_index": null,
+      "associated_nakshatra": null,
+      "magnitude": 1.97,
+      "ra_hours": 2.5291415218822926,
+      "dec_degrees": 89.26416781288567,
+      "distance_light_years": 431.4237864059344,
+      "tropical_longitude_deg": 88.4373598226528,
+      "sidereal_longitude_deg": 64.72569724478736,
+      "ecliptic_latitude_deg": 66.10043807654006,
+      "rasi_index": 2,
+      "rasi": {
+        "english": "Gemini",
+        "sanskrit": "Mithuna",
+        "tamil": "Midhunam",
+        "sinhala": null
+      },
+      "nakshatra_index": 4,
+      "proper_motion_ra_mas_per_year": 44.22,
+      "proper_motion_dec_mas_per_year": -11.74
+    },
+    {
+      "hip_id": 27366,
+      "name": "Meissa",
+      "designation": "Lambda Orionis",
+      "sanskrit_name": "M\u1e5bga\u015bir\u0101",
+      "associated_nakshatra_index": 4,
+      "associated_nakshatra": {
+        "english": "Mrigashira",
+        "sanskrit": "M\u1e5bga\u015bira",
+        "tamil": "Mrigasheersham",
+        "sinhala": null
+      },
+      "magnitude": 2.07,
+      "ra_hours": 5.795940810938917,
+      "dec_degrees": -9.669597983940687,
+      "distance_light_years": 721.584919681374,
+      "tropical_longitude_deg": 86.26884008348281,
+      "sidereal_longitude_deg": 62.557177505617375,
+      "ecliptic_latitude_deg": -33.071868491333156,
+      "rasi_index": 2,
+      "rasi": {
+        "english": "Gemini",
+        "sanskrit": "Mithuna",
+        "tamil": "Midhunam",
+        "sinhala": null
+      },
+      "nakshatra_index": 4,
+      "proper_motion_ra_mas_per_year": 1.55,
+      "proper_motion_dec_mas_per_year": -1.2
+    },
+    {
+      "hip_id": 14576,
+      "name": "35 Arietis",
+      "designation": "35 Arietis",
+      "sanskrit_name": "Bhara\u1e47\u012b",
+      "associated_nakshatra_index": 1,
+      "associated_nakshatra": {
+        "english": "Bharani",
+        "sanskrit": "Bhara\u1e47\u012b",
+        "tamil": "Bharani",
+        "sinhala": "Kethi"
+      },
+      "magnitude": 2.09,
+      "ra_hours": 3.136147059512115,
+      "dec_degrees": 40.95565316778486,
+      "distance_light_years": 92.81628452160676,
+      "tropical_longitude_deg": 56.03801663597664,
+      "sidereal_longitude_deg": 32.3263540581112,
+      "ecliptic_latitude_deg": 22.42744873725071,
+      "rasi_index": 1,
+      "rasi": {
+        "english": "Taurus",
+        "sanskrit": "V\u1e5b\u1e63abha",
+        "tamil": "Rishabam",
+        "sinhala": null
+      },
+      "nakshatra_index": 2,
+      "proper_motion_ra_mas_per_year": 2.39,
+      "proper_motion_dec_mas_per_year": -1.44
+    },
+    {
+      "hip_id": 57632,
+      "name": "Denebola",
+      "designation": "Beta Leonis",
+      "sanskrit_name": "Uttar\u0101 Phalgun\u012b",
+      "associated_nakshatra_index": 11,
+      "associated_nakshatra": {
+        "english": "Uttara Phalguni",
+        "sanskrit": "Uttara Phalgun\u012b",
+        "tamil": "Uthiram",
+        "sinhala": "Utra"
+      },
+      "magnitude": 2.14,
+      "ra_hours": 11.817833548145256,
+      "dec_degrees": 14.572648782655538,
+      "distance_light_years": 36.17528651133936,
+      "tropical_longitude_deg": 171.4895598824588,
+      "sidereal_longitude_deg": 147.77789730459335,
+      "ecliptic_latitude_deg": 12.268370898711824,
+      "rasi_index": 4,
+      "rasi": {
+        "english": "Leo",
+        "sanskrit": "Si\u1e43ha",
+        "tamil": "Simmam",
+        "sinhala": null
+      },
+      "nakshatra_index": 11,
+      "proper_motion_ra_mas_per_year": -499.02,
+      "proper_motion_dec_mas_per_year": -113.78
+    },
+    {
+      "hip_id": 78401,
+      "name": "Dschubba",
+      "designation": "Delta Scorpii",
+      "sanskrit_name": "Anur\u0101dh\u0101",
+      "associated_nakshatra_index": 16,
+      "associated_nakshatra": {
+        "english": "Anuradha",
+        "sanskrit": "Anur\u0101dh\u0101",
+        "tamil": "Anusham",
+        "sinhala": "Anura"
+      },
+      "magnitude": 2.29,
+      "ra_hours": 16.005560417587414,
+      "dec_degrees": -22.621522279186255,
+      "distance_light_years": 401.67040083704046,
+      "tropical_longitude_deg": 242.44145252796173,
+      "sidereal_longitude_deg": 218.7297899500963,
+      "ecliptic_latitude_deg": -1.984713367467318,
+      "rasi_index": 7,
+      "rasi": {
+        "english": "Scorpio",
+        "sanskrit": "V\u1e5b\u015bcika",
+        "tamil": "Vrischikam",
+        "sinhala": null
+      },
+      "nakshatra_index": 16,
+      "proper_motion_ra_mas_per_year": -8.67,
+      "proper_motion_dec_mas_per_year": -36.9
+    },
+    {
+      "hip_id": 113963,
+      "name": "Markab",
+      "designation": "Alpha Pegasi",
+      "sanskrit_name": "P\u016brv\u0101 Bh\u0101drapad\u0101",
+      "associated_nakshatra_index": 24,
+      "associated_nakshatra": {
+        "english": "Purva Bhadrapada",
+        "sanskrit": "P\u016brva Bh\u0101drapad\u0101",
+        "tamil": "Poorattathi",
+        "sinhala": "Poorvabadrapada"
+      },
+      "magnitude": 2.49,
+      "ra_hours": 23.079327232696883,
+      "dec_degrees": 15.205483450994159,
+      "distance_light_years": 139.6217369036629,
+      "tropical_longitude_deg": 353.35603842160464,
+      "sidereal_longitude_deg": 329.6443758437392,
+      "ecliptic_latitude_deg": 19.406375304307687,
+      "rasi_index": 10,
+      "rasi": {
+        "english": "Aquarius",
+        "sanskrit": "Kumbha",
+        "tamil": "Kumbam",
+        "sinhala": null
+      },
+      "nakshatra_index": 24,
+      "proper_motion_ra_mas_per_year": 61.1,
+      "proper_motion_dec_mas_per_year": -42.56
+    },
+    {
+      "hip_id": 54872,
+      "name": "Zosma",
+      "designation": "Delta Leonis",
+      "sanskrit_name": "P\u016brv\u0101 Phalgun\u012b",
+      "associated_nakshatra_index": 10,
+      "associated_nakshatra": {
+        "english": "Purva Phalguni",
+        "sanskrit": "P\u016brva Phalgun\u012b",
+        "tamil": "Pooram",
+        "sinhala": "Pubba"
+      },
+      "magnitude": 2.56,
+      "ra_hours": 11.235086374160042,
+      "dec_degrees": 20.524385252998822,
+      "distance_light_years": 57.706368842204604,
+      "tropical_longitude_deg": 161.185495972184,
+      "sidereal_longitude_deg": 137.47383339431855,
+      "ecliptic_latitude_deg": 14.333611408994072,
+      "rasi_index": 4,
+      "rasi": {
+        "english": "Leo",
+        "sanskrit": "Si\u1e43ha",
+        "tamil": "Simmam",
+        "sinhala": null
+      },
+      "nakshatra_index": 10,
+      "proper_motion_ra_mas_per_year": 143.31,
+      "proper_motion_dec_mas_per_year": -130.43
+    },
+    {
+      "hip_id": 8903,
+      "name": "Sheratan",
+      "designation": "Beta Arietis",
+      "sanskrit_name": "A\u015bvin\u012b",
+      "associated_nakshatra_index": 0,
+      "associated_nakshatra": {
+        "english": "Ashwini",
+        "sanskrit": "A\u015bvin\u012b",
+        "tamil": "Aswini",
+        "sinhala": "Aswida"
+      },
+      "magnitude": 2.64,
+      "ra_hours": 1.9106351191264597,
+      "dec_degrees": 20.808590848325206,
+      "distance_light_years": 59.5828340623034,
+      "tropical_longitude_deg": 33.84009234854458,
+      "sidereal_longitude_deg": 10.12842977067914,
+      "ecliptic_latitude_deg": 8.487156416701197,
+      "rasi_index": 0,
+      "rasi": {
+        "english": "Aries",
+        "sanskrit": "Me\u1e63a",
+        "tamil": "Mesham",
+        "sinhala": null
+      },
+      "nakshatra_index": 0,
+      "proper_motion_ra_mas_per_year": 96.32,
+      "proper_motion_dec_mas_per_year": -108.8
+    },
+    {
+      "hip_id": 89931,
+      "name": "Kaus Media",
+      "designation": "Delta Sagittarii",
+      "sanskrit_name": "P\u016brv\u0101\u1e63\u0101\u1e0dh\u0101",
+      "associated_nakshatra_index": 19,
+      "associated_nakshatra": {
+        "english": "Purva Ashadha",
+        "sanskrit": "P\u016brv\u0101\u1e63\u0101\u1e0dh\u0101",
+        "tamil": "Pooraadam",
+        "sinhala": "Poorvashada"
+      },
+      "magnitude": 2.72,
+      "ra_hours": 18.349888828955205,
+      "dec_degrees": -29.82796948574937,
+      "distance_light_years": 305.6760645718716,
+      "tropical_longitude_deg": 274.45089621891384,
+      "sidereal_longitude_deg": 250.7392336410484,
+      "ecliptic_latitude_deg": -6.470875468565087,
+      "rasi_index": 8,
+      "rasi": {
+        "english": "Sagittarius",
+        "sanskrit": "Dhanus",
+        "tamil": "Dhanusu",
+        "sinhala": null
+      },
+      "nakshatra_index": 18,
+      "proper_motion_ra_mas_per_year": 29.96,
+      "proper_motion_dec_mas_per_year": -26.38
+    },
+    {
+      "hip_id": 72622,
+      "name": "Zubenelgenubi",
+      "designation": "Alpha Librae",
+      "sanskrit_name": "Vi\u015b\u0101kh\u0101",
+      "associated_nakshatra_index": 15,
+      "associated_nakshatra": {
+        "english": "Vishakha",
+        "sanskrit": "Vi\u015b\u0101kh\u0101",
+        "tamil": "Visaakam",
+        "sinhala": "Visaka"
+      },
+      "magnitude": 2.75,
+      "ra_hours": 14.848012641889675,
+      "dec_degrees": -16.04142523167609,
+      "distance_light_years": 77.19676324928194,
+      "tropical_longitude_deg": 224.95326017145936,
+      "sidereal_longitude_deg": 201.24159759359392,
+      "ecliptic_latitude_deg": 0.33451909454637463,
+      "rasi_index": 6,
+      "rasi": {
+        "english": "Libra",
+        "sanskrit": "Tul\u0101",
+        "tamil": "Thulam",
+        "sinhala": null
+      },
+      "nakshatra_index": 15,
+      "proper_motion_ra_mas_per_year": -105.69,
+      "proper_motion_dec_mas_per_year": -69.0
+    },
+    {
+      "hip_id": 90496,
+      "name": "Nunki",
+      "designation": "Sigma Sagittarii",
+      "sanskrit_name": "Uttar\u0101\u1e63\u0101\u1e0dh\u0101",
+      "associated_nakshatra_index": 20,
+      "associated_nakshatra": {
+        "english": "Uttara Ashadha",
+        "sanskrit": "Uttar\u0101\u1e63\u0101\u1e0dh\u0101",
+        "tamil": "Uthiraadam",
+        "sinhala": "Uttrashada"
+      },
+      "magnitude": 2.82,
+      "ra_hours": 18.466194933715766,
+      "dec_degrees": -25.420753538019458,
+      "distance_light_years": 77.28822548056114,
+      "tropical_longitude_deg": 276.187554249038,
+      "sidereal_longitude_deg": 252.47589167117255,
+      "ecliptic_latitude_deg": -2.133472541129683,
+      "rasi_index": 8,
+      "rasi": {
+        "english": "Sagittarius",
+        "sanskrit": "Dhanus",
+        "tamil": "Dhanusu",
+        "sinhala": null
+      },
+      "nakshatra_index": 18,
+      "proper_motion_ra_mas_per_year": -44.81,
+      "proper_motion_dec_mas_per_year": -186.29
+    },
+    {
+      "hip_id": 1067,
+      "name": "Algenib",
+      "designation": "Gamma Pegasi",
+      "sanskrit_name": "Uttar\u0101 Bh\u0101drapad\u0101",
+      "associated_nakshatra_index": 25,
+      "associated_nakshatra": {
+        "english": "Uttara Bhadrapada",
+        "sanskrit": "Uttara Bh\u0101drapad\u0101",
+        "tamil": "Uthirattathi",
+        "sinhala": "Uttrabadrapada"
+      },
+      "magnitude": 2.83,
+      "ra_hours": 0.22059653007355287,
+      "dec_degrees": 15.183638723069965,
+      "distance_light_years": 333.1525859795396,
+      "tropical_longitude_deg": 9.026506317507305,
+      "sidereal_longitude_deg": 345.31484373964184,
+      "ecliptic_latitude_deg": 12.599665649154312,
+      "rasi_index": 11,
+      "rasi": {
+        "english": "Pisces",
+        "sanskrit": "M\u012bna",
+        "tamil": "Meenam",
+        "sinhala": null
+      },
+      "nakshatra_index": 25,
+      "proper_motion_ra_mas_per_year": 4.7,
+      "proper_motion_dec_mas_per_year": -8.24
+    },
+    {
+      "hip_id": 17702,
+      "name": "Alcyone",
+      "designation": "Eta Tauri",
+      "sanskrit_name": "K\u1e5bttik\u0101",
+      "associated_nakshatra_index": 2,
+      "associated_nakshatra": {
+        "english": "Krittika",
+        "sanskrit": "K\u1e5bttik\u0101",
+        "tamil": "Karthigai",
+        "sinhala": "Katyo"
+      },
+      "magnitude": 2.85,
+      "ra_hours": 3.791403036369838,
+      "dec_degrees": 24.10535633192306,
+      "distance_light_years": 367.70731749125736,
+      "tropical_longitude_deg": 59.86258023658553,
+      "sidereal_longitude_deg": 36.15091765872009,
+      "ecliptic_latitude_deg": 4.050060294364418,
+      "rasi_index": 1,
+      "rasi": {
+        "english": "Taurus",
+        "sanskrit": "V\u1e5b\u1e63abha",
+        "tamil": "Rishabam",
+        "sinhala": null
+      },
+      "nakshatra_index": 2,
+      "proper_motion_ra_mas_per_year": 19.35,
+      "proper_motion_dec_mas_per_year": -43.11
+    },
+    {
+      "hip_id": 60965,
+      "name": "Algorab",
+      "designation": "Delta Corvi",
+      "sanskrit_name": "Hast\u0101",
+      "associated_nakshatra_index": 12,
+      "associated_nakshatra": {
+        "english": "Hasta",
+        "sanskrit": "Hasta",
+        "tamil": "Hastham",
+        "sinhala": "Hatha"
+      },
+      "magnitude": 2.94,
+      "ra_hours": 12.49781117573776,
+      "dec_degrees": -16.514721209774773,
+      "distance_light_years": 87.88907520663288,
+      "tropical_longitude_deg": 193.32288118828214,
+      "sidereal_longitude_deg": 169.6112186104167,
+      "ecliptic_latitude_deg": -12.19481799213443,
+      "rasi_index": 5,
+      "rasi": {
+        "english": "Virgo",
+        "sanskrit": "Kany\u0101",
+        "tamil": "Kanni",
+        "sinhala": null
+      },
+      "nakshatra_index": 12,
+      "proper_motion_ra_mas_per_year": -209.97,
+      "proper_motion_dec_mas_per_year": -139.3
+    },
+    {
+      "hip_id": 43109,
+      "name": "Ashlesha",
+      "designation": "Epsilon Hydrae",
+      "sanskrit_name": "\u0100\u015ble\u1e63\u0101",
+      "associated_nakshatra_index": 8,
+      "associated_nakshatra": {
+        "english": "Ashlesha",
+        "sanskrit": "\u0100\u015ble\u1e63\u0101",
+        "tamil": "Aayilyam",
+        "sinhala": "Asaleya"
+      },
+      "magnitude": 3.38,
+      "ra_hours": 8.779664749369042,
+      "dec_degrees": 6.419015662184124,
+      "distance_light_years": 135.16635011405612,
+      "tropical_longitude_deg": 132.2162347685493,
+      "sidereal_longitude_deg": 108.50457219068386,
+      "ecliptic_latitude_deg": -11.104421465631289,
+      "rasi_index": 3,
+      "rasi": {
+        "english": "Cancer",
+        "sanskrit": "Karka\u1e6da",
+        "tamil": "Kadagam",
+        "sinhala": null
+      },
+      "nakshatra_index": 8,
+      "proper_motion_ra_mas_per_year": -231.04,
+      "proper_motion_dec_mas_per_year": -40.17
+    },
+    {
+      "hip_id": 112961,
+      "name": "Hydor",
+      "designation": "Lambda Aquarii",
+      "sanskrit_name": "\u015aatabhi\u1e63\u0101",
+      "associated_nakshatra_index": 23,
+      "associated_nakshatra": {
+        "english": "Shatabhisha",
+        "sanskrit": "\u015aatabhi\u1e63\u0101",
+        "tamil": "Sadayam",
+        "sinhala": "Satha"
+      },
+      "magnitude": 3.73,
+      "ra_hours": 22.87690345740985,
+      "dec_degrees": -7.5797646643380725,
+      "distance_light_years": 391.5442674448024,
+      "tropical_longitude_deg": 341.44617928997604,
+      "sidereal_longitude_deg": 317.7345167121106,
+      "ecliptic_latitude_deg": -0.3864735708546817,
+      "rasi_index": 10,
+      "rasi": {
+        "english": "Aquarius",
+        "sanskrit": "Kumbha",
+        "tamil": "Kumbam",
+        "sinhala": null
+      },
+      "nakshatra_index": 23,
+      "proper_motion_ra_mas_per_year": 19.51,
+      "proper_motion_dec_mas_per_year": 32.71
+    },
+    {
+      "hip_id": 42911,
+      "name": "Asellus Australis",
+      "designation": "Delta Cancri",
+      "sanskrit_name": "Pu\u1e63y\u0101",
+      "associated_nakshatra_index": 7,
+      "associated_nakshatra": {
+        "english": "Pushya",
+        "sanskrit": "Pu\u1e63ya",
+        "tamil": "Poosam",
+        "sinhala": "Pussa"
+      },
+      "magnitude": 3.94,
+      "ra_hours": 8.744755664847892,
+      "dec_degrees": 18.155471169610564,
+      "distance_light_years": 136.0685877789953,
+      "tropical_longitude_deg": 128.59196179208215,
+      "sidereal_longitude_deg": 104.8802992142167,
+      "ecliptic_latitude_deg": 0.0774189483312013,
+      "rasi_index": 3,
+      "rasi": {
+        "english": "Cancer",
+        "sanskrit": "Karka\u1e6da",
+        "tamil": "Kadagam",
+        "sinhala": null
+      },
+      "nakshatra_index": 7,
+      "proper_motion_ra_mas_per_year": -17.1,
+      "proper_motion_dec_mas_per_year": -228.46
+    },
+    {
+      "hip_id": 102281,
+      "name": "Rotanev",
+      "designation": "Beta Delphini",
+      "sanskrit_name": "Dhani\u1e63\u1e6dh\u0101",
+      "associated_nakshatra_index": 22,
+      "associated_nakshatra": {
+        "english": "Dhanishtha",
+        "sanskrit": "Dhani\u1e63\u1e6dh\u0101",
+        "tamil": "Avittam",
+        "sinhala": "Avitta"
+      },
+      "magnitude": 4.43,
+      "ra_hours": 20.724322056596755,
+      "dec_degrees": 15.074795400518827,
+      "distance_light_years": 203.46622886614315,
+      "tropical_longitude_deg": 317.98727521231416,
+      "sidereal_longitude_deg": 294.27561263444875,
+      "ecliptic_latitude_deg": 31.944554295315445,
+      "rasi_index": 9,
+      "rasi": {
+        "english": "Capricorn",
+        "sanskrit": "Makara",
+        "tamil": "Makaram",
+        "sinhala": null
+      },
+      "nakshatra_index": 22,
+      "proper_motion_ra_mas_per_year": -19.61,
+      "proper_motion_dec_mas_per_year": -41.74
+    },
+    {
+      "hip_id": 573,
+      "name": "Zeta Piscium",
+      "designation": "Zeta Piscium",
+      "sanskrit_name": "Revat\u012b",
+      "associated_nakshatra_index": 26,
+      "associated_nakshatra": {
+        "english": "Revati",
+        "sanskrit": "Revat\u012b",
+        "tamil": "Revathi",
+        "sinhala": "Revathi"
+      },
+      "magnitude": 7.62,
+      "ra_hours": 0.11562978852007133,
+      "dec_degrees": -43.985313947713266,
+      "distance_light_years": 874.4138781717971,
+      "tropical_longitude_deg": 340.2568970854534,
+      "sidereal_longitude_deg": 316.5452345075879,
+      "ecliptic_latitude_deg": -40.2276392706011,
+      "rasi_index": 10,
+      "rasi": {
+        "english": "Aquarius",
+        "sanskrit": "Kumbha",
+        "tamil": "Kumbam",
+        "sinhala": null
+      },
+      "nakshatra_index": 23,
+      "proper_motion_ra_mas_per_year": 41.23,
+      "proper_motion_dec_mas_per_year": 16.72
+    }
+  ],
+  "count": 36
+}
