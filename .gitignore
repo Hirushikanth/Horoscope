@@ -32,6 +32,9 @@ htmlcov/
 .DS_Store
 Thumbs.db
 
+# Docs (not tracked)
+docs/
+
 # Gemini Mandates
 GEMINI.md
 CLAUDE.md
