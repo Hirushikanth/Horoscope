@@ -5,16 +5,17 @@ import { Input } from '../ui/Input';
 import { GlowButton } from '../ui/GlowButton';
 import { DateInput } from '../ui/Calendar';
 import { Clock } from '../ui/Clock';
-import { fetchHoroscope } from '../../utils/api';
-import type { BirthData } from '../../types';
+import { fetchJathakam, fetchPanchangam } from '../../utils/api';
+import type { BirthRequest } from '../../types';
 import { useAppStore } from '../../store/appStore';
 import { motion } from 'motion/react';
 
 export const BirthForm = () => {
   const setHoroscopeData = useAppStore((state) => state.setHoroscopeData);
+  const setPanchangamData = useAppStore((state) => state.setPanchangamData);
 
   // Pre-filled with Colombo, Sri Lanka for instant testing
-  const [formData, setFormData] = useState<BirthData>({
+  const [formData, setFormData] = useState<BirthRequest>({
     date: '1995-05-15',
     time: '10:30:00',
     latitude: 6.9271,
@@ -23,9 +24,16 @@ export const BirthForm = () => {
   });
 
   const mutation = useMutation({
-    mutationFn: fetchHoroscope,
-    onSuccess: (data) => {
-      setHoroscopeData(data, formData);
+    mutationFn: async (data: BirthRequest) => {
+      const [jathakam, panchangam] = await Promise.all([
+        fetchJathakam(data),
+        fetchPanchangam(data),
+      ]);
+      return { jathakam, panchangam };
+    },
+    onSuccess: ({ jathakam, panchangam }) => {
+      setHoroscopeData(jathakam, formData);
+      setPanchangamData(panchangam);
     },
     onError: (error) => {
       console.error('API Error:', error);

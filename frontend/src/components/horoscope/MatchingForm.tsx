@@ -2,10 +2,9 @@ import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { GlassCard } from '../ui/GlassCard';
 import { Input } from '../ui/Input';
-import { SystemToggle } from '../ui/SystemToggle';
 import { GlowButton } from '../ui/GlowButton';
 import { fetchMatching } from '../../utils/api';
-import { type MatchingInput } from '../../types';
+import type { MatchingRequest } from '../../types';
 import { useAppStore } from '../../store/appStore';
 import { motion } from 'motion/react';
 import { HeartHandshake } from 'lucide-react';
@@ -13,7 +12,7 @@ import { HeartHandshake } from 'lucide-react';
 export const MatchingForm = () => {
   const setMatchingData = useAppStore((state) => state.setMatchingData);
 
-  const [formData, setFormData] = useState<MatchingInput>({
+  const [formData, setFormData] = useState<MatchingRequest>({
     bride: {
       date: '1995-05-15',
       time: '10:30:00',
@@ -28,7 +27,6 @@ export const MatchingForm = () => {
       longitude: 79.8612,
       timezone: 'Asia/Colombo',
     },
-    system: 'south_indian',
   });
 
   const mutation = useMutation({
@@ -74,20 +72,6 @@ export const MatchingForm = () => {
       
       <form onSubmit={handleSubmit} className="flex flex-col gap-6">
         
-        {/* Sleek Floating System Toggle */}
-        <div className="flex flex-col items-center justify-center w-full mb-2">
-          <p className="text-gray-400 text-[10px] tracking-[0.2em] uppercase mb-3">Matching Tradition</p>
-          <SystemToggle 
-            value={formData.system}
-            onChange={(val) => setFormData(prev => ({ ...prev, system: val as any }))}
-            options={[
-              { value: 'north_indian', label: 'North' },
-              { value: 'both', label: 'Combined' },
-              { value: 'south_indian', label: 'South' },
-            ]}
-          />
-        </div>
-
         {/* Dual Form Cards (Side-by-Side on Desktop) */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
           
@@ -139,7 +123,7 @@ export const MatchingForm = () => {
         <div className="w-full max-w-md mx-auto mt-4 relative z-20">
           <GlowButton type="submit" isLoading={mutation.isPending}>
             <HeartHandshake className="w-5 h-5 mr-2" />
-            Calculate Cosmic Union
+            Calculate Kalyana Porutham
           </GlowButton>
         </div>
 

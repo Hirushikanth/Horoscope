@@ -2,8 +2,9 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { HeroCard } from './HeroCard';
 import { PanchangCard } from './PanchangCard';
-import { YogasCarousel } from './YogasCarousel';
+import { AlmanacCard } from './AlmanacCard';
 import { KundliChart } from '../canvas/KundliChart';
+import { NavamsaChart } from '../canvas/NavamsaChart';
 import { PlanetsList } from './PlanetsList';
 import { BhavasList } from './BhavasList';
 import { DashaTimeline } from './DashaTimeline';
@@ -62,44 +63,44 @@ export const Dashboard = () => {
                 <HeroCard />
                 <PanchangCard />
 
-                <GlassCard className="col-span-1 p-6 flex flex-col justify-center text-center">
+                <GlassCard className="col-span-1 md:col-span-1 lg:col-span-2 p-6 flex flex-col justify-center text-center">
                   <p className="text-gold-primary tracking-widest text-[10px] uppercase mb-2">Born In</p>
                   <h3 className="font-cinematic text-3xl font-bold text-white mb-1">
-                    {horoscopeData.janma_nakshatra.dasha_lord_at_birth}
+                    {horoscopeData.dasha.balance.lord}
                   </h3>
                   <p className="text-xs text-gray-400">Mahadasha</p>
                   <div className="mt-4 pt-4 border-t border-white/10">
                     <p className="text-white text-sm font-medium">
-                      {horoscopeData.janma_nakshatra.dasha_balance_years.toFixed(1)} Years Balance
+                      {horoscopeData.dasha.balance.balance_years.toFixed(1)} Years Balance
                     </p>
                   </div>
                 </GlassCard>
 
-                <GlassCard className="col-span-1 p-6 flex flex-col justify-center text-center">
+                <GlassCard className="col-span-1 md:col-span-1 lg:col-span-2 p-6 flex flex-col justify-center text-center">
                   <p className="text-gold-primary tracking-widest text-[10px] uppercase mb-2">Ayanamsa</p>
                   <h3 className="font-cinematic text-3xl font-bold text-white mb-1">
-                    {horoscopeData.planets._meta.ayanamsa.toFixed(4)}°
+                    {horoscopeData.meta.ayanamsa.value_deg.toFixed(4)}°
                   </h3>
-                  <p className="text-xs text-gray-400">Lahiri Chitrapaksha</p>
+                  <p className="text-xs text-gray-400">{horoscopeData.meta.ayanamsa.system} Chitrapaksha</p>
                   <div className="mt-4 pt-4 border-t border-white/10">
                     <p className="text-[10px] text-gray-500 uppercase tracking-widest">
-                      NASA JPL DE440
+                      {horoscopeData.meta.ephemeris.source}
                     </p>
                   </div>
                 </GlassCard>
               </div>
-              <div className="w-full">
-                <YogasCarousel />
-              </div>
+
+              <AlmanacCard />
             </div>
           )}
 
           {activeTab === 'visual' && (
-            <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 w-full">
-              <div className="xl:col-span-5 h-fit lg:sticky top-6">
+            <div className="space-y-8">
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 w-full">
                 <KundliChart />
+                <NavamsaChart />
               </div>
-              <div className="xl:col-span-7">
+              <div className="w-full">
                 <PlanetsList />
               </div>
             </div>

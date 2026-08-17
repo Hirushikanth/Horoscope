@@ -6,54 +6,33 @@ export const DoshaAlerts = () => {
   const { matchingData } = useAppStore();
   if (!matchingData) return null;
 
-  const { vedha, manglik_dosha, kootas } = matchingData;
+  const { chevvai_cross_check, verdict } = matchingData;
   const alerts: { title: string; desc: string }[] = [];
 
-  // Vedha Dosha (Mutual Repulsion)
-  if (vedha.has_vedha) {
+  // Failed Rajju / Vedha gates
+  const failedGates = Object.entries(verdict.gates).filter(([, status]) => status !== 'ok');
+  failedGates.forEach(([gate]) => {
     alerts.push({
-      title: 'Vedha Dosha Detected',
-      desc: vedha.description,
+      title: `${gate === 'rajju' ? 'Rajju' : 'Vedha'} Gate Failed`,
+      desc: `The ${gate === 'rajju' ? 'Rajju' : 'Vedha'} porutham gate has failed, overriding the total score.`,
     });
-  }
+  });
 
-  // Papasamyam (Dosha Samyam Balance)
-  if (matchingData.papasamyam && !matchingData.papasamyam.compatibility.is_compatible) {
-    alerts.push({
-      title: 'Papasamyam Mismatch',
-      desc: matchingData.papasamyam.compatibility.description,
-    });
-  }
-
-  // Manglik Dosha (Mars Affliction)
-  if (!manglik_dosha.both_manglik_cancellation) {
-    if (manglik_dosha.bride.is_manglik && !manglik_dosha.bride.is_cancelled) {
+  // Non-negotiables that failed
+  Object.entries(verdict.non_negotiables).forEach(([name, ok]) => {
+    if (!ok) {
       alerts.push({
-        title: 'Bride: Manglik Dosha',
-        desc: manglik_dosha.bride.description,
+        title: `${name === 'gana' ? 'Gana' : name} Non-negotiable Failed`,
+        desc: 'A non-negotiable porutham failed for this match.',
       });
     }
-    if (manglik_dosha.groom.is_manglik && !manglik_dosha.groom.is_cancelled) {
-      alerts.push({
-        title: 'Groom: Manglik Dosha',
-        desc: manglik_dosha.groom.description,
-      });
-    }
-  }
+  });
 
-  // Bhakoot Dosha (Emotional Disharmony)
-  if (kootas?.bhakoot?.dosha_present && !kootas?.bhakoot?.dosha_cancelled) {
+  // Chevvai Dosham mismatch
+  if (!chevvai_cross_check.compatible) {
     alerts.push({
-      title: 'Bhakoot Dosha',
-      desc: kootas.bhakoot.description,
-    });
-  }
-
-  // Nadi Dosha (Genetic/Health Risk)
-  if (kootas?.nadi?.dosha_present && !kootas?.nadi?.dosha_cancelled) {
-    alerts.push({
-      title: 'Nadi Dosha',
-      desc: kootas.nadi.description,
+      title: 'Chevvai Dosham Mismatch',
+      desc: chevvai_cross_check.note,
     });
   }
 

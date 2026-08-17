@@ -2,15 +2,11 @@ import { motion } from 'motion/react';
 import { useAppStore } from '../../store/appStore';
 import { MatchingHero } from './MatchingHero';
 import { DoshaAlerts } from './DoshaAlerts';
-import { AshtaKootaGrid } from './AshtaKootaGrid';
-import { MatchingDeepDive } from './MatchingDeepDive';
+import { PoruthamsGrid } from './PoruthamsGrid';
 
 export const MatchingDashboard = () => {
-  const { matchingData, matchingInput } = useAppStore();
+  const { matchingData } = useAppStore();
   if (!matchingData) return null;
-
-  // We only show Ashta Koota grid if system is 'north_indian' or 'both'
-  const showAshtaKoota = matchingInput?.system === 'north_indian' || matchingInput?.system === 'both';
 
   return (
     <motion.div
@@ -31,16 +27,9 @@ export const MatchingDashboard = () => {
         <DoshaAlerts />
       </motion.div>
 
-      {/* ---------------- LAYER 3: 8-FOLD GRID (North Indian) ---------------- */}
-      {showAshtaKoota && (
-        <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}>
-          <AshtaKootaGrid />
-        </motion.div>
-      )}
-
-      {/* ---------------- LAYER 4: DEEP DIVE ACCORDIONS ---------------- */}
+      {/* ---------------- LAYER 3: KALYANA PORUTHAM GRID ---------------- */}
       <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}>
-        <MatchingDeepDive />
+        <PoruthamsGrid />
       </motion.div>
 
     </motion.div>

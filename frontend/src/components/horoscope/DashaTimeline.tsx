@@ -1,29 +1,43 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useAppStore } from '../../store/appStore';
 import { motion, AnimatePresence } from 'motion/react';
 import { ChevronDown, Clock } from 'lucide-react';
+import type { DashaPeriodInfo, JathakamResponse } from '../../types';
+
+// Helper: extract YYYY-MM-DD from an ISO 8601 UTC timestamp
+const toDate = (iso: string) => iso.slice(0, 10);
+
+const isCurrentPeriod = (start: string, end: string) => {
+  const today = new Date();
+  return today >= new Date(start) && today <= new Date(end);
+};
 
 export const DashaTimeline = () => {
   const { horoscopeData } = useAppStore();
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
+  const [autoExpandedFor, setAutoExpandedFor] = useState<JathakamResponse | null>(null);
 
-  if (!horoscopeData || !horoscopeData.dasha) return null;
+  const periods = horoscopeData?.dasha?.periods ?? [];
+  const balance = horoscopeData?.dasha?.balance;
 
-  const { mahadashas } = horoscopeData.dasha;
+  const mahadashas = periods.filter((p) => p.category === 'mahadasha');
+  const antardashasOf = (maha: DashaPeriodInfo) =>
+    periods.filter(
+      (p) => p.category === 'antardasha' && p.start_jd >= maha.start_jd && p.end_jd <= maha.end_jd,
+    );
 
-  // Helper to check if today falls within a start and end date string (YYYY-MM-DD)
-  const isCurrentPeriod = (start: string, end: string) => {
-    const today = new Date();
-    return today >= new Date(start) && today <= new Date(end);
-  };
+  const effectiveYears = (p: DashaPeriodInfo) => p.years + p.days / 365.25;
 
-  // Auto-expand the current Mahadasha on mount
-  useEffect(() => {
-    const currentIndex = mahadashas.findIndex((maha: any) => isCurrentPeriod(maha.start_date, maha.end_date));
-    if (currentIndex !== -1) {
-      setExpandedIndex(currentIndex);
-    }
-  },[mahadashas]);
+  // Auto-expand the current Mahadasha once per payload (guarded state
+  // adjustment during render — the documented pattern for "derived from
+  // previous render" state).
+  if (horoscopeData && autoExpandedFor !== horoscopeData) {
+    setAutoExpandedFor(horoscopeData);
+    const currentIndex = mahadashas.findIndex((maha) => isCurrentPeriod(maha.start_utc, maha.end_utc));
+    setExpandedIndex(currentIndex !== -1 ? currentIndex : null);
+  }
+
+  if (!horoscopeData || !horoscopeData.dasha || !balance) return null;
 
   return (
     <div className="w-full mt-10">
@@ -35,12 +49,17 @@ export const DashaTimeline = () => {
           </h2>
           <p className="text-sm text-gray-400 mt-1">120-Year Planetary Timeline</p>
         </div>
+        <div className="text-right text-xs text-gray-500">
+          <p>Balance at birth: {balance.lord}</p>
+          <p>{balance.balance_years.toFixed(2)} years</p>
+        </div>
       </div>
 
       <div className="relative border-l-2 border-white/10 ml-4 md:ml-6 space-y-6 pb-10">
-        {mahadashas.map((maha: any, index: number) => {
-          const isActiveMaha = isCurrentPeriod(maha.start_date, maha.end_date);
+        {mahadashas.map((maha, index) => {
+          const isActiveMaha = isCurrentPeriod(maha.start_utc, maha.end_utc);
           const isOpen = expandedIndex === index;
+          const antardashas = antardashasOf(maha);
 
           return (
             <div key={index} className="relative pl-6 md:pl-8">
@@ -71,7 +90,7 @@ export const DashaTimeline = () => {
                   <div>
                     <div className="flex items-center gap-3 mb-1">
                       <h3 className={`font-cinematic text-2xl font-bold ${isActiveMaha ? 'text-gold-light' : 'text-white'}`}>
-                        {maha.lord} <span className="text-sm font-sans font-normal text-gray-400">Mahadasha</span>
+                        {maha.graha} <span className="text-sm font-sans font-normal text-gray-400">Mahadasha</span>
                       </h3>
                       {isActiveMaha && (
                         <span className="text-[10px] uppercase tracking-widest px-2 py-0.5 rounded bg-gold-primary/20 text-gold-primary border border-gold-primary/30">
@@ -80,13 +99,13 @@ export const DashaTimeline = () => {
                       )}
                     </div>
                     <p className="text-xs text-gray-400 tracking-widest uppercase font-medium">
-                      {maha.start_date} <span className="text-gold-primary/50 mx-2">→</span> {maha.end_date}
+                      {toDate(maha.start_utc)} <span className="text-gold-primary/50 mx-2">→</span> {toDate(maha.end_utc)}
                     </p>
                   </div>
                   
                   <div className="flex items-center gap-4">
                     <span className="text-xs text-gray-500 hidden sm:block">
-                      {maha.effective_years.toFixed(1)} Years
+                      {effectiveYears(maha).toFixed(1)} Years
                     </span>
                     <motion.div animate={{ rotate: isOpen ? 180 : 0 }} transition={{ duration: 0.3 }}>
                       <ChevronDown className={isActiveMaha ? 'text-gold-light' : 'text-gray-500'} />
@@ -110,8 +129,8 @@ export const DashaTimeline = () => {
                         </div>
                         
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                          {maha.antardashas.map((antar: any, aIndex: number) => {
-                            const isActiveAntar = isCurrentPeriod(antar.start_date, antar.end_date);
+                          {antardashas.map((antar, aIndex) => {
+                            const isActiveAntar = isCurrentPeriod(antar.start_utc, antar.end_utc);
                             
                             return (
                               <div 
@@ -124,10 +143,10 @@ export const DashaTimeline = () => {
                               >
                                 <div>
                                   <p className={`font-medium ${isActiveAntar ? 'text-gold-light' : 'text-gray-200'}`}>
-                                    {antar.lord}
+                                    {antar.graha}
                                   </p>
                                   <p className="text-[10px] text-gray-500 mt-1">
-                                    {antar.start_date}
+                                    {toDate(antar.start_utc)}
                                   </p>
                                 </div>
                                 {isActiveAntar && (
